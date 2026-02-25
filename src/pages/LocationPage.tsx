@@ -123,9 +123,9 @@ const LocationPage: React.FC = () => {
             className="bg-primary/5 border border-primary/15 rounded-xl p-10 text-center">
             <h2 className="text-2xl font-bold mb-5">{t('location.cta.title')}</h2>
             <p className="text-muted-foreground text-sm mb-5">{t('location.cta.subtitle')}</p>
-            <div className="flex justify-center gap-4">
-              <Link to="/contact"><Button size="lg" className="rounded-[8px]">{t('location.cta.schedule')}</Button></Link>
-              <Link to="/medical-tourism"><Button size="lg" variant="outline" className="rounded-[8px]">{t('location.cta.tourism')}</Button></Link>
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4">
+              <Link to="/contact" className="w-full sm:w-auto"><Button size="lg" className="rounded-[8px] w-full sm:w-auto">{t('location.cta.schedule')}</Button></Link>
+              <Link to="/medical-tourism" className="w-full sm:w-auto"><Button size="lg" variant="outline" className="rounded-[8px] w-full sm:w-auto">{t('location.cta.tourism')}</Button></Link>
             </div>
           </motion.div>
         </section>
