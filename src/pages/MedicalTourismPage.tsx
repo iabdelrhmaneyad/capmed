@@ -44,41 +44,55 @@ const MedicalTourismPage: React.FC = () => {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   const tiers = [
-    { tier: 1, icon: Video, title: 'Remote Second Opinion (RSO)', target: 'Information Seekers', color: 'from-primary/20 to-primary/5 border-primary/20',
-      deliverables: ['DICOM re-evaluation', 'Multidisciplinary board opinion', 'Surgical Feasibility Score'], cta: 'Request RSO' },
-    { tier: 2, icon: Stethoscope, title: 'Procedure-Only Clinical', target: 'Experienced Medical Nomads', color: 'from-secondary/20 to-secondary/5 border-secondary/20',
-      deliverables: ['Surgery & anesthesia', 'Immediate hospital stay', 'No hospitality support'], cta: 'Get Quote' },
-    { tier: 3, icon: Shield, title: 'Essential International Package', target: 'Mid-market Patients', color: 'from-accent/20 to-accent/5 border-accent/30',
-      deliverables: ['Surgery + 3-5 night hotel', 'Basic transfers', '1-month tele-follow-up'], cta: 'Book Package', popular: true },
-    { tier: 4, icon: Plane, title: 'Premium Door-to-Door Concierge', target: 'Hands-off Experience Seekers', color: 'from-primary/20 to-primary/5 border-primary/20',
-      deliverables: ['Full logistics & visa tracking', '4-star recovery hotel', 'Daily nurse visits'], cta: 'Inquire Now' },
-    { tier: 5, icon: Crown, title: 'VIP Executive / Royal Care', target: 'UHNWI & Diplomats', color: 'from-accent/25 to-accent/5 border-accent/30',
-      deliverables: ['Private wings', 'Senior surgeon guarantee', 'Personal security & luxury companion services'], cta: 'VIP Inquiry' },
-    { tier: 6, icon: HeartPulse, title: 'Advanced Complex Case Program', target: 'Oncology, Cardiac, Multi-stage', color: 'from-destructive/15 to-destructive/5 border-destructive/20',
-      deliverables: ['ICU capacity planning', 'Advanced imaging', 'Risk-Adjusted Pricing'], cta: 'Submit Case' },
-    { tier: 7, icon: Building, title: 'Institutional & Government', target: 'Embassies, Ministries, Corporations', color: 'from-secondary/20 to-secondary/5 border-secondary/20',
-      deliverables: ['Bulk pricing & SLA guarantees', 'Annual performance reports', 'Dedicated account management'], cta: 'Partner With Us' },
+    {
+      tier: 1, icon: Video, title: language === 'ar' ? 'رأي طبي ثانٍ عن بُعد' : 'Remote Second Opinion (RSO)', target: language === 'ar' ? 'الباحثون عن المعلومات' : 'Information Seekers', color: 'from-primary/20 to-primary/5 border-primary/20',
+      deliverables: language === 'ar' ? ['إعادة تقييم DICOM', 'رأي مجلس طبي متعدد التخصصات', 'درجة جدوى الجراحة'] : ['DICOM re-evaluation', 'Multidisciplinary board opinion', 'Surgical Feasibility Score'], cta: language === 'ar' ? 'طلب رأي طبي' : 'Request RSO'
+    },
+    {
+      tier: 2, icon: Stethoscope, title: language === 'ar' ? 'إجراءات سريرية فقط' : 'Procedure-Only Clinical', target: language === 'ar' ? 'المسافرون الطبيون ذوو الخبرة' : 'Experienced Medical Nomads', color: 'from-secondary/20 to-secondary/5 border-secondary/20',
+      deliverables: language === 'ar' ? ['الجراحة والتخدير', 'إقامة فورية في المستشفى', 'بدون دعم ضيافة'] : ['Surgery & anesthesia', 'Immediate hospital stay', 'No hospitality support'], cta: language === 'ar' ? 'احصل على عرض سعر' : 'Get Quote'
+    },
+    {
+      tier: 3, icon: Shield, title: language === 'ar' ? 'الباقة الدولية الأساسية' : 'Essential International Package', target: language === 'ar' ? 'مرضى السوق المتوسط' : 'Mid-market Patients', color: 'from-accent/20 to-accent/5 border-accent/30',
+      deliverables: language === 'ar' ? ['جراحة + فندق 3-5 ليالي', 'نقل أساسي', 'متابعة عن بعد لمدة شهر'] : ['Surgery + 3-5 night hotel', 'Basic transfers', '1-month tele-follow-up'], cta: language === 'ar' ? 'حجز الباقة' : 'Book Package', popular: true
+    },
+    {
+      tier: 4, icon: Plane, title: language === 'ar' ? 'خدمة كونسيرج مميزة' : 'Premium Door-to-Door Concierge', target: language === 'ar' ? 'الباحثون عن تجربة مريحة' : 'Hands-off Experience Seekers', color: 'from-primary/20 to-primary/5 border-primary/20',
+      deliverables: language === 'ar' ? ['تتبع كامل للاستقبال والتأشيرة', 'فندق تعافي 4 نجوم', 'زيارات يومية من ممرضين'] : ['Full logistics & visa tracking', '4-star recovery hotel', 'Daily nurse visits'], cta: language === 'ar' ? 'استفسر الآن' : 'Inquire Now'
+    },
+    {
+      tier: 5, icon: Crown, title: language === 'ar' ? 'رعاية كبار الشخصيات والملكية' : 'VIP Executive / Royal Care', target: language === 'ar' ? 'كبار الشخصيات والدبلوماسيين' : 'UHNWI & Diplomats', color: 'from-accent/25 to-accent/5 border-accent/30',
+      deliverables: language === 'ar' ? ['أجنحة خاصة', 'ضمان توفير جراح أول', 'أمن شخصي وخدمات فاخرة'] : ['Private wings', 'Senior surgeon guarantee', 'Personal security & luxury companion services'], cta: language === 'ar' ? 'استفسار VIP' : 'VIP Inquiry'
+    },
+    {
+      tier: 6, icon: HeartPulse, title: language === 'ar' ? 'برنامج الحالات المعقدة المتقدمة' : 'Advanced Complex Case Program', target: language === 'ar' ? 'الأورام، القلب، متعدد المراحل' : 'Oncology, Cardiac, Multi-stage', color: 'from-destructive/15 to-destructive/5 border-destructive/20',
+      deliverables: language === 'ar' ? ['تخطيط سعة العناية المركزة', 'تصوير متقدم', 'تسعير معدل المخاطر'] : ['ICU capacity planning', 'Advanced imaging', 'Risk-Adjusted Pricing'], cta: language === 'ar' ? 'إرسال حالة' : 'Submit Case'
+    },
+    {
+      tier: 7, icon: Building, title: language === 'ar' ? 'حكومي ومؤسسات' : 'Institutional & Government', target: language === 'ar' ? 'السفارات، الوزارات، الشركات' : 'Embassies, Ministries, Corporations', color: 'from-secondary/20 to-secondary/5 border-secondary/20',
+      deliverables: language === 'ar' ? ['أسعار الجملة وضمانات SLA', 'تقارير الأداء السنوية', 'إدارة حسابات مخصصة'] : ['Bulk pricing & SLA guarantees', 'Annual performance reports', 'Dedicated account management'], cta: language === 'ar' ? 'شراكة معنا' : 'Partner With Us'
+    },
   ];
 
   const phases = [
-    { num: 1, title: 'Triage', subtitle: 'Virtual Screening', icon: Video, items: ['Risk scoring algorithm', 'Encrypted video consult', 'Initial case assessment'] },
-    { num: 2, title: 'Pre-Arrival', subtitle: 'Medical Clearance', icon: FileCheck, items: ['Digital consent forms', 'Anesthesia pre-clearance', 'Travel coordination'] },
-    { num: 3, title: 'Execution', subtitle: 'Clinical Quality', icon: Activity, items: ['Real-time family portal', 'JCI badge transparency', 'Dedicated care team'] },
-    { num: 4, title: 'Recovery', subtitle: 'Controlled Tourism', icon: Heart, items: ['Daily mobility milestones', 'Doctor-approved excursions', 'Wellness activities'] },
-    { num: 5, title: 'Continuity', subtitle: 'Long-Term Safety', icon: Shield, items: ['Multilingual discharge summary', 'Local physician referral', 'Tele-follow-up plan'] },
+    { num: 1, title: language === 'ar' ? 'الفرز' : 'Triage', subtitle: language === 'ar' ? 'فرز افتراضي' : 'Virtual Screening', icon: Video, items: language === 'ar' ? ['خوارزمية تسجيل المخاطر', 'استشارة فيديو مشفرة', 'التقييم الأولي للحالة'] : ['Risk scoring algorithm', 'Encrypted video consult', 'Initial case assessment'] },
+    { num: 2, title: language === 'ar' ? 'قبل الوصول' : 'Pre-Arrival', subtitle: language === 'ar' ? 'تصريح طبي' : 'Medical Clearance', icon: FileCheck, items: language === 'ar' ? ['نماذج الموافقة الرقمية', 'التصريح المسبق للتخدير', 'تنسيق السفر'] : ['Digital consent forms', 'Anesthesia pre-clearance', 'Travel coordination'] },
+    { num: 3, title: language === 'ar' ? 'التنفيذ' : 'Execution', subtitle: language === 'ar' ? 'الجودة السريرية' : 'Clinical Quality', icon: Activity, items: language === 'ar' ? ['بوابة أسرة في الوقت الفعلي', 'شفافية شارة JCI', 'فريق رعاية مخصص'] : ['Real-time family portal', 'JCI badge transparency', 'Dedicated care team'] },
+    { num: 4, title: language === 'ar' ? 'التعافي' : 'Recovery', subtitle: language === 'ar' ? 'سياحة منضبطة' : 'Controlled Tourism', icon: Heart, items: language === 'ar' ? ['مراحل الحركة اليومية', 'رحلات معتمدة من الطبيب', 'أنشطة العافية'] : ['Daily mobility milestones', 'Doctor-approved excursions', 'Wellness activities'] },
+    { num: 5, title: language === 'ar' ? 'الاستمرارية' : 'Continuity', subtitle: language === 'ar' ? 'السلامة طويلة الأمد' : 'Long-Term Safety', icon: Shield, items: language === 'ar' ? ['ملخص خروج متعدد اللغات', 'إحالة طبيب محلي', 'خطة متابعة عن بعد'] : ['Multilingual discharge summary', 'Local physician referral', 'Tele-follow-up plan'] },
   ];
 
   const differentiation = [
-    { icon: DollarSign, title: 'International Cost Transparency Engine', desc: 'Live currency conversion with "Savings vs. Home Country" comparisons.', points: ['Live currency conversion', '"Savings vs. Home Country" comparisons', 'Integrated payment plans'] },
-    { icon: BarChart3, title: 'Clinical Performance Dashboard', desc: 'Public-facing 30-day complication rates and PROMs.', points: ['Public 30-day complication rates', 'Patient-reported outcome measures', 'Surgical volume transparency'] },
-    { icon: Shield, title: 'Continuity of Care ("Safe Return")', desc: 'Home-Physician Handshake & complication insurance.', points: ['Home-Physician Handshake protocol', 'Complication Insurance coverage', 'Post-return medication management'] },
-    { icon: Target, title: 'Risk & Safety Governance', desc: 'Plan B contingency & monthly morbidity reviews.', points: ['Plan B emergency repatriation', 'Monthly morbidity review', 'ICU backup arrangements'] },
+    { icon: DollarSign, title: language === 'ar' ? 'محرك شفافية التكلفة الدولية' : 'International Cost Transparency Engine', desc: language === 'ar' ? 'تحويل العملات المباشر مع مقارنات "التوفير مقابل الوطن".' : 'Live currency conversion with "Savings vs. Home Country" comparisons.', points: language === 'ar' ? ['تحويل العملات المباشر', 'مقارنات "التوفير مقابل الوطن"', 'خطط دفع متكاملة'] : ['Live currency conversion', '"Savings vs. Home Country" comparisons', 'Integrated payment plans'] },
+    { icon: BarChart3, title: language === 'ar' ? 'لوحة الأداء السريري' : 'Clinical Performance Dashboard', desc: language === 'ar' ? 'معدلات المضاعفات لمدة 30 يومًا العامة ومقاييس النتائج المبلغ عنها للمرضى.' : 'Public-facing 30-day complication rates and PROMs.', points: language === 'ar' ? ['معدلات المضاعفات العامة لمدة 30 يومًا', 'مقاييس النتائج المبلغ عنها للمرضى', 'شفافية حجم الجراحة'] : ['Public 30-day complication rates', 'Patient-reported outcome measures', 'Surgical volume transparency'] },
+    { icon: Shield, title: language === 'ar' ? 'استمرارية الرعاية ("العودة الآمنة")' : 'Continuity of Care ("Safe Return")', desc: language === 'ar' ? 'بروتوكول "مصافحة الطبيب في الوطن" وتأمين المضاعفات.' : 'Home-Physician Handshake & complication insurance.', points: language === 'ar' ? ['بروتوكول مصافحة الطبيب في الوطن', 'تغطية تأمين المضاعفات', 'إدارة الأدوية بعد العودة'] : ['Home-Physician Handshake protocol', 'Complication Insurance coverage', 'Post-return medication management'] },
+    { icon: Target, title: language === 'ar' ? 'إدارة المخاطر والسلامة' : 'Risk & Safety Governance', desc: language === 'ar' ? 'خطة ب للحالات الطارئة ومراجعات شهرية للمراضة.' : 'Plan B contingency & monthly morbidity reviews.', points: language === 'ar' ? ['العودة الطارئة بخطة ب', 'المراجعة الشهرية للمراضة', 'ترتيبات النسخ الاحتياطي لوحدة العناية المركزة'] : ['Plan B emergency repatriation', 'Monthly morbidity review', 'ICU backup arrangements'] },
   ];
 
   const tech = [
-    { icon: Smartphone, title: 'Patient App', desc: 'Single source of truth for schedules, records, and secure messaging.', gradient: 'from-primary to-primary-light' },
-    { icon: Link2, title: 'Blockchain Records', desc: 'Secure, immutable archive of surgical reports and pathology.', gradient: 'from-secondary to-primary' },
-    { icon: Watch, title: 'Wearable Integration', desc: 'Remote vitals monitoring during hotel recovery phase.', gradient: 'from-accent to-secondary' },
+    { icon: Smartphone, title: language === 'ar' ? 'تطبيق المريض' : 'Patient App', desc: language === 'ar' ? 'مصدر الحقيقة الموحد للجداول، السجلات، والرسائل الآمنة.' : 'Single source of truth for schedules, records, and secure messaging.', gradient: 'from-primary to-primary-light' },
+    { icon: Link2, title: language === 'ar' ? 'سجلات السلسلة (بلوكشين)' : 'Blockchain Records', desc: language === 'ar' ? 'أرشيف آمن وغير قابل للتغيير لتقارير الجراحة والأمراض.' : 'Secure, immutable archive of surgical reports and pathology.', gradient: 'from-secondary to-primary' },
+    { icon: Watch, title: language === 'ar' ? 'المتابعة القابلة للارتداء' : 'Wearable Integration', desc: language === 'ar' ? 'مراقبة العلامات الحيوية عن بعد خلال مرحلة التعافي في الفندق.' : 'Remote vitals monitoring during hotel recovery phase.', gradient: 'from-accent to-secondary' },
   ];
 
   const kpiRef = useRef(null);
@@ -216,7 +230,9 @@ const MedicalTourismPage: React.FC = () => {
                       className={`relative bg-card rounded-2xl border p-10 overflow-hidden ${tier.popular ? 'border-accent ring-2 ring-accent/20 shadow-lg shadow-accent/10' : 'border-border'}`}>
                       <div className={`absolute inset-0 bg-gradient-to-br ${tier.color} opacity-30`} />
                       {tier.popular && (
-                        <Badge className="absolute top-4 right-4 bg-accent text-accent-foreground text-xs shadow-lg">⭐ Core Offer</Badge>
+                        <Badge className="absolute top-4 right-4 bg-accent text-accent-foreground text-xs shadow-lg">
+                          {language === 'ar' ? '⭐ العرض الأساسي' : '⭐ Core Offer'}
+                        </Badge>
                       )}
                       <div className="relative z-10">
                         <div className="flex items-center gap-4 mb-6">
@@ -226,7 +242,9 @@ const MedicalTourismPage: React.FC = () => {
                           <tier.icon className="w-7 h-7 text-muted-foreground" />
                         </div>
                         <h3 className="font-bold text-xl mb-2">{tier.title}</h3>
-                        <p className="text-sm text-secondary font-medium mb-6">Target: {tier.target}</p>
+                        <p className="text-sm text-secondary font-medium mb-6">
+                          {language === 'ar' ? 'المستهدف:' : 'Target:'} {tier.target}
+                        </p>
                         <ul className="space-y-3 mb-8">
                           {tier.deliverables.map((d, j) => (
                             <motion.li key={j} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: j * 0.1 }}
@@ -356,9 +374,9 @@ const MedicalTourismPage: React.FC = () => {
           <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
             className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {[
-              { icon: Zap, title: 'Upsell Mechanics', desc: 'VIP surgeon upgrades, premium recovery suites, and companion wellness packages.', color: 'text-accent' },
-              { icon: Users, title: 'Flex-Upgrade System', desc: 'Modular care — add private nurse or extend telemedicine on demand.', color: 'text-primary' },
-              { icon: ArrowRight, title: 'Conversion Tools', desc: '"Free Case Review" CTAs and 48-hour cost estimate guarantee.', color: 'text-secondary' },
+              { icon: Zap, title: language === 'ar' ? 'آليات زيادة المبيعات' : 'Upsell Mechanics', desc: language === 'ar' ? 'ترقيات لجراح كبار الشخصيات، أجنحة تعافي فاخرة، وباقات عافية للمرافقين.' : 'VIP surgeon upgrades, premium recovery suites, and companion wellness packages.', color: 'text-accent' },
+              { icon: Users, title: language === 'ar' ? 'نظام ترقية مرن' : 'Flex-Upgrade System', desc: language === 'ar' ? 'رعاية معيارية — أضف ممرضًا خاصًا أو مدد التطبيب عن بُعد عند الطلب.' : 'Modular care — add private nurse or extend telemedicine on demand.', color: 'text-primary' },
+              { icon: ArrowRight, title: language === 'ar' ? 'أدوات التحويل' : 'Conversion Tools', desc: language === 'ar' ? 'دعوات "مراجعة مجانية للحالة" وضمان تقدير التكلفة خلال 48 ساعة.' : '"Free Case Review" CTAs and 48-hour cost estimate guarantee.', color: 'text-secondary' },
             ].map((item, i) => (
               <motion.div key={i} variants={fadeUp}
                 whileHover={{ y: -6, rotateY: 5 }}
@@ -412,9 +430,9 @@ const MedicalTourismPage: React.FC = () => {
           </motion.div>
           <div className="grid md:grid-cols-3 gap-8 max-w-3xl mx-auto">
             {[
-              { icon: Brain, label: 'Clinical', value: `<${complication}%`, sub: 'Complication Rate', color: 'text-primary', bg: 'from-primary/10 to-primary/5' },
-              { icon: Clock, label: 'Operational', value: `${conversion}%`, sub: 'Conversion Rate', color: 'text-secondary', bg: 'from-secondary/10 to-secondary/5' },
-              { icon: DollarSign, label: 'Financial', value: `$${arpu}K`, sub: 'Avg Revenue Per User', color: 'text-accent', bg: 'from-accent/10 to-accent/5' },
+              { icon: Brain, label: language === 'ar' ? 'سريرياً' : 'Clinical', value: `<${complication}%`, sub: language === 'ar' ? 'معدل المضاعفات' : 'Complication Rate', color: 'text-primary', bg: 'from-primary/10 to-primary/5' },
+              { icon: Clock, label: language === 'ar' ? 'تشغيلياً' : 'Operational', value: `${conversion}%`, sub: language === 'ar' ? 'معدل التحويل' : 'Conversion Rate', color: 'text-secondary', bg: 'from-secondary/10 to-secondary/5' },
+              { icon: DollarSign, label: language === 'ar' ? 'مالياً' : 'Financial', value: `$${arpu}K`, sub: language === 'ar' ? 'متوسط الإيرادات لكل مستخدم' : 'Avg Revenue Per User', color: 'text-accent', bg: 'from-accent/10 to-accent/5' },
             ].map((kpi, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 30, scale: 0.9 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true }}
                 transition={{ delay: i * 0.15 }}
