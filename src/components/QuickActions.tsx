@@ -33,13 +33,14 @@ const QuickActions: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.05 }}
+                className="w-full"
               >
-                <Link to={action.href}>
-                  <div className="group flex flex-col items-center justify-center p-6 bg-card rounded-xl border border-border hover:border-primary/20 hover:shadow-md transition-all duration-300 cursor-pointer">
-                    <div className="w-12 h-12 rounded-xl bg-primary/8 flex items-center justify-center mb-3 group-hover:bg-primary group-hover:scale-105 transition-all duration-300">
-                      <Icon className="w-5 h-5 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
+                <Link to={action.href} className="block w-full h-full">
+                  <div className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-card rounded-xl border border-border hover:border-primary/20 hover:shadow-md transition-all duration-300 cursor-pointer h-full">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/8 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary group-hover:scale-105 transition-all duration-300">
+                      <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
                     </div>
-                    <span className="text-xs font-medium text-foreground text-center leading-tight">
+                    <span className="text-[10px] sm:text-xs font-medium text-foreground text-center leading-tight">
                       {t(action.key)}
                     </span>
                   </div>

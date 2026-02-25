@@ -8,8 +8,6 @@ import Services from '@/components/Services';
 import About from '@/components/About';
 import Pillars from '@/components/Pillars';
 import Footer from '@/components/Footer';
-import Chatbot from '@/components/Chatbot';
-
 
 const Index: React.FC = () => {
   return (
@@ -29,7 +27,6 @@ const Index: React.FC = () => {
         <About />
       </main>
       <Footer />
-      <Chatbot />
     </motion.div>
   );
 };
