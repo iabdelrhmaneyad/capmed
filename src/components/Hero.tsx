@@ -54,7 +54,7 @@ const Hero: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-6">
+      <div className="relative z-10 container mx-auto px-6 pb-24 md:pb-0">
         <div className="max-w-2xl">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
