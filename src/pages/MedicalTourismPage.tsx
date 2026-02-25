@@ -139,10 +139,10 @@ const MedicalTourismPage: React.FC = () => {
             </motion.p>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}
               className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-full px-8 h-13 text-base font-semibold shadow-lg shadow-accent/30">
+              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-[8px] px-8 h-12 text-sm font-semibold shadow-lg shadow-accent/30">
                 <Sparkles className="w-4 h-4 mr-2" />{t('tourism.cta.review')}
               </Button>
-              <Button size="lg" className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 rounded-full px-8 h-13 text-base">
+              <Button size="lg" className="bg-white text-foreground hover:bg-white/90 rounded-[8px] px-8 h-12 text-sm font-semibold border-0">
                 <Clock className="w-4 h-4 mr-2" />{t('tourism.cta.estimate')}
               </Button>
             </motion.div>
