@@ -43,6 +43,8 @@ const Hero: React.FC = () => {
             key={index}
             src={slide.image}
             alt="CapitalMed"
+            loading={index === 0 ? "eager" : "lazy"}
+            fetchPriority={index === 0 ? "high" : "auto"}
             className="absolute inset-0 w-full h-full object-cover blur-[2px] scale-105"
             initial={false}
             animate={{ opacity: index === currentSlide ? 1 : 0 }}
@@ -96,16 +98,16 @@ const Hero: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.4 }}
-            className="flex flex-wrap gap-4"
+            className="flex flex-col sm:flex-row flex-wrap gap-4 max-w-lg"
           >
-            <Link to="/campus-map">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-[8px] px-8 h-12 text-sm font-semibold">
+            <Link to="/campus-map" className="w-full sm:w-auto">
+              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-[8px] px-8 h-12 text-sm font-semibold w-full sm:w-auto">
                 <MapPin className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
                 Navigate Campus
               </Button>
             </Link>
-            <Link to="/about">
-              <Button size="lg" className="bg-white text-foreground hover:bg-white/90 rounded-[8px] px-8 h-12 text-sm font-semibold border-0">
+            <Link to="/about" className="w-full sm:w-auto">
+              <Button size="lg" className="bg-white text-foreground hover:bg-white/90 rounded-[8px] px-8 h-12 text-sm font-semibold border-0 w-full sm:w-auto">
                 {t('hero.cta.learn')}
               </Button>
             </Link>
@@ -139,9 +141,9 @@ const Hero: React.FC = () => {
       </div>
 
       {/* Slide Navigation */}
-      <div className="absolute bottom-28 md:bottom-8 left-0 right-0 md:left-auto md:right-8 flex items-center justify-center md:justify-end gap-3 z-20 px-6 pointer-events-none">
+      <div className="absolute bottom-8 md:bottom-8 left-0 right-0 md:left-auto md:right-8 flex items-center justify-center md:justify-end gap-3 z-20 px-6 pointer-events-none pb-8 md:pb-0">
         <button onClick={prevSlide} className="pointer-events-auto w-12 h-12 rounded-full border-2 border-white/30 flex items-center justify-center text-white/80 hover:text-white hover:border-white/60 hover:bg-white/10 transition-all cursor-pointer active:scale-95 shrink-0">
-          <ChevronLeft className="w-5 h-5" />
+          {isRTL ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
         </button>
         <div className="pointer-events-auto flex gap-2">
           {heroSlides.map((_, index) => (
@@ -154,7 +156,7 @@ const Hero: React.FC = () => {
           ))}
         </div>
         <button onClick={nextSlide} className="pointer-events-auto w-12 h-12 rounded-full border-2 border-white/30 flex items-center justify-center text-white/80 hover:text-white hover:border-white/60 hover:bg-white/10 transition-all cursor-pointer active:scale-95 shrink-0">
-          <ChevronRight className="w-5 h-5" />
+          {isRTL ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
         </button>
       </div>
     </section>

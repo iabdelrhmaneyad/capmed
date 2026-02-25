@@ -505,6 +505,35 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Common
     'common.search': 'Search',
+
+    // Miscs discovered
+    'misc.healthcareExcellence': 'Healthcare Excellence',
+    'misc.researchInnovation': 'Research & Innovation',
+    'misc.pageNotFound': 'Oops! Page not found',
+    'misc.latestUpdates': 'Latest Updates',
+    'misc.capitalMed': 'CapitalMed',
+    'misc.capitalMedCity': 'CapitalMed Healthcare City',
+    'misc.helpCenter': 'Help Center',
+    'misc.expertTeam': 'Expert Medical Team',
+    'misc.getInTouch': 'Get In Touch',
+    'misc.joinTeam': 'Join Our Team',
+    'misc.aboutCapitalMed': 'About CapitalMed',
+    'map.legend': 'Legend',
+    'map.bldg': 'Bldg',
+    'map.contact': 'Contact',
+    'map.services': 'Services',
+    'map.endTour': 'End Tour',
+    'map.emergency': 'Emergency',
+    'map.filter': 'Filter',
+    'map.virtualTour': 'Virtual Tour',
+    'map.directory': 'Directory',
+    'map.reset': 'Reset',
+    'map.campusDirectory': 'Campus Directory',
+    'map.navigatingTo': 'Navigating to',
+    'map.tour': 'Tour',
+    'lang.en': 'English',
+    'lang.fr': 'Français',
+    'lang.de': 'Deutsch',
   },
   ar: {
     // Navigation
@@ -1001,6 +1030,35 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Common
     'common.search': 'بحث',
+
+    // Miscs discovered
+    'misc.healthcareExcellence': 'التميز في الرعاية الصحية',
+    'misc.researchInnovation': 'البحث والابتكار',
+    'misc.pageNotFound': 'عذراً! الصفحة غير موجودة',
+    'misc.latestUpdates': 'أحدث التطورات',
+    'misc.capitalMed': 'كابيتال ميد',
+    'misc.capitalMedCity': 'مدينة كابيتال ميد الطبية',
+    'misc.helpCenter': 'مركز المساعدة',
+    'misc.expertTeam': 'فريق طبي خبير',
+    'misc.getInTouch': 'تواصل معنا',
+    'misc.joinTeam': 'انضم لفريقنا',
+    'misc.aboutCapitalMed': 'عن كابيتال ميد',
+    'map.legend': 'مفتاح الخريطة',
+    'map.bldg': 'مبنى',
+    'map.contact': 'جهة الاتصال',
+    'map.services': 'الخدمات',
+    'map.endTour': 'إنهاء الجولة',
+    'map.emergency': 'الطوارئ',
+    'map.filter': 'تصفية',
+    'map.virtualTour': 'جولة افتراضية',
+    'map.directory': 'الدليل',
+    'map.reset': 'إعادة ضبط',
+    'map.campusDirectory': 'دليل الحرم',
+    'map.navigatingTo': 'التوجه إلى',
+    'map.tour': 'جولة',
+    'lang.en': 'الإنجليزية',
+    'lang.fr': 'الفرنسية',
+    'lang.de': 'الألمانية',
   },
 };
 

@@ -6,26 +6,29 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 const CareersPage: React.FC = () => {
   const { t, language } = useLanguage();
-  const jobs = language === 'ar'
+  const isAr = language === 'ar';
+
+  const jobs = isAr
     ? [
-        { id: 1, title: 'استشاري قلب أول', department: 'طبي', type: 'دوام كامل', location: 'المستشفى الجامعي', posted: '٢٠٢٦-٠١-٠٥' },
-        { id: 2, title: 'ممرض عناية مركزة', department: 'تمريض', type: 'دوام كامل', location: 'الحرم الرئيسي', posted: '٢٠٢٦-٠١-٠٢' },
-        { id: 3, title: 'منسق أبحاث سريرية', department: 'أبحاث', type: 'دوام كامل', location: 'معهد الأبحاث', posted: '٢٠٢٥-١٢-٣٠' },
-        { id: 4, title: 'أخصائي موارد بشرية', department: 'إداري', type: 'دوام كامل', location: 'المبنى الإداري', posted: '٢٠٢٥-١٢-٢٥' },
-        { id: 5, title: 'جراح أطفال', department: 'طبي', type: 'دوام كامل', location: 'المستشفى الجامعي', posted: '٢٠٢٥-١٢-٢٠' },
-        { id: 6, title: 'فني أشعة', department: 'طبي', type: 'دوام جزئي', location: 'مركز التشخيص', posted: '٢٠٢٥-١٢-١٨' },
-      ]
+      { id: 1, title: 'استشاري قلب أول', department: 'طبي', type: 'دوام كامل', location: 'المستشفى الجامعي', posted: '٢٠٢٦-٠١-٠٥', description: 'نبحث عن استشاري قلب ذو خبرة لقيادة قسم أمراض القلب وتقديم رعاية متقدمة للمرضى.', requirements: ['بورد معتمد في أمراض القلب', 'خبرة ١٠+ سنوات', 'مهارات قيادية قوية'] },
+      { id: 2, title: 'ممرض عناية مركزة', department: 'تمريض', type: 'دوام كامل', location: 'الحرم الرئيسي', posted: '٢٠٢٦-٠١-٠٢', description: 'انضم إلى فريق التمريض في العناية المركزة لتقديم رعاية حثيثة للمرضى ذوي الحالات الحرجة المشددة.', requirements: ['رخصة مزاولة مهنة سارية', 'خبرة سنتين في العناية المركزة (ICU)', 'دورة الإنعاش القلبي والرئوي (BLS/ACLS)'] },
+      { id: 3, title: 'منسق أبحاث سريرية', department: 'أبحاث', type: 'دوام كامل', location: 'معهد الأبحاث', posted: '٢٠٢٥-١٢-٣٠', description: 'المساعدة في تنسيق وإدارة التجارب السريرية الجارية مع الالتزام بالبروتوكولات الطبية والتنظيمية العالمية.', requirements: ['درجة البكالوريوس في علوم الحياة', 'الاهتمام بالتفاصيل', 'إجادة اللغة الإنجليزية'] },
+      { id: 4, title: 'أخصائي موارد بشرية', department: 'إداري', type: 'دوام كامل', location: 'المبنى الإداري', posted: '٢٠٢٥-١٢-٢٥', description: 'إدارة عمليات التوظيف والتدريب لموظفي كابيتال ميد وضمان بيئة عمل احترافية ومتميزة.', requirements: ['خبرة إدارية ٣ سنوات على الأقل', 'مهارات تواصل فائقة', 'معرفة بقوانين العمل'] },
+      { id: 5, title: 'جراح أطفال', department: 'طبي', type: 'دوام كامل', location: 'المستشفى الجامعي', posted: '٢٠٢٥-١٢-٢٠', description: 'مطلوب جراح متخصص في جراحة الأطفال للانضمام إلى قسم طب الأطفال في المستشفى الجامعي.', requirements: ['بورد في الجراحة العامة وطب الأطفال', 'سجل عمليات ناجح', 'رخصة ممارسة سارية'] },
+      { id: 6, title: 'فني أشعة', department: 'طبي', type: 'دوام جزئي', location: 'مركز التشخيص', posted: '٢٠٢٥-١٢-١٨', description: 'تشغيل أجهزة الأشعة المقطعية والرنين المغناطيسي لضمان دقة التشخيص.', requirements: ['دبلوم أو بكالوريوس أشعة', 'القدرة على العمل بنظام الورديات'] },
+    ]
     : [
-        { id: 1, title: 'Senior Cardiologist Consultant', department: 'Medical', type: 'Full-time', location: 'University Hospital', posted: '2026-01-05' },
-        { id: 2, title: 'ICU Registered Nurse', department: 'Nursing', type: 'Full-time', location: 'Main Campus', posted: '2026-01-02' },
-        { id: 3, title: 'Clinical Research Coordinator', department: 'Research', type: 'Full-time', location: 'Research Institute', posted: '2025-12-30' },
-        { id: 4, title: 'HR Specialist', department: 'Administrative', type: 'Full-time', location: 'Admin Building', posted: '2025-12-25' },
-        { id: 5, title: 'Pediatric Surgeon', department: 'Medical', type: 'Full-time', location: 'University Hospital', posted: '2025-12-20' },
-        { id: 6, title: 'Radiology Technician', department: 'Medical', type: 'Part-time', location: 'Diagnostic Center', posted: '2025-12-18' },
-      ];
+      { id: 1, title: 'Senior Cardiologist Consultant', department: 'Medical', type: 'Full-time', location: 'University Hospital', posted: '2026-01-05', description: 'We are seeking an experienced Senior Cardiologist to lead the cardiology department and handle complex cardiovascular conditions.', requirements: ['Board Certified in Cardiology', '10+ years of clinical experience', 'Strong leadership skills'] },
+      { id: 2, title: 'ICU Registered Nurse', department: 'Nursing', type: 'Full-time', location: 'Main Campus', posted: '2026-01-02', description: 'Join our Intensive Care Unit nursing team providing critical round-the-clock care for severely ill patients.', requirements: ['Valid RN License', '2+ years ICU experience', 'BLS and ACLS certifications required'] },
+      { id: 3, title: 'Clinical Research Coordinator', department: 'Research', type: 'Full-time', location: 'Research Institute', posted: '2025-12-30', description: 'Assist in the coordination and management of ongoing clinical trials ensuring all protocols are followed safely and ethically.', requirements: ['BSc in Life Sciences or related field', 'Strong attention to detail', 'Excellent organizational skills'] },
+      { id: 4, title: 'HR Specialist', department: 'Administrative', type: 'Full-time', location: 'Admin Building', posted: '2025-12-25', description: 'Manage recruitment operations, onboarding, and training for new CapitalMed staff while ensuring a professional work environment.', requirements: ['3+ years in Human Resources', 'Excellent communication', 'Knowledge of labor laws'] },
+      { id: 5, title: 'Pediatric Surgeon', department: 'Medical', type: 'Full-time', location: 'University Hospital', posted: '2025-12-20', description: 'A highly skilled pediatric surgeon is needed to join our pediatric clinical wing.', requirements: ['Board Certified Pediatric Surgeon', 'Proven track record of successful operations', 'Valid active medical license'] },
+      { id: 6, title: 'Radiology Technician', department: 'Medical', type: 'Part-time', location: 'Diagnostic Center', posted: '2025-12-18', description: 'Operate advanced imaging equipment such as MRI and CT scanners to produce accurate diagnostic imagery.', requirements: ['Diploma or BSc in Radiologic Technology', 'Ability to work flexible shift hours'] },
+    ];
   const departments = [
     { key: 'all', label: t('careers.filter.allDepts') },
     { key: 'Medical', label: t('careers.filter.medical') },
@@ -54,7 +57,7 @@ const CareersPage: React.FC = () => {
         <section className="page-hero">
           <div className="container mx-auto px-6 relative z-10 text-center">
             <motion.p initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-              className="text-secondary text-xs font-semibold uppercase tracking-[0.2em] mb-3">Join Our Team</motion.p>
+              className="text-secondary text-xs font-semibold uppercase tracking-[0.2em] mb-3">{t('misc.joinTeam')}</motion.p>
             <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
               className="text-4xl md:text-5xl font-bold text-white mb-4">{t('careers.hero.title')}</motion.h1>
             <motion.p initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
@@ -88,7 +91,37 @@ const CareersPage: React.FC = () => {
                       <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{t('careers.posted')} {job.posted}</span>
                     </div>
                   </div>
-                  <Button size="sm" className="rounded-[8px]">{t('careers.viewDetails')}</Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button size="sm" className="rounded-[8px]">{t('careers.viewDetails')}</Button>
+                    </DialogTrigger>
+                    <DialogContent className={`sm:max-w-[500px] ${isAr ? 'text-right' : 'text-left'}`}>
+                      <DialogHeader>
+                        <DialogTitle className={`text-xl ${isAr ? 'text-right' : 'text-left'}`}>{job.title}</DialogTitle>
+                        <DialogDescription className={`${isAr ? 'text-right' : 'text-left'} flex flex-wrap gap-2 text-xs pt-1 mt-1`}>
+                          <span className="inline-flex items-center gap-1 border border-border px-2 py-0.5 rounded-md"><Briefcase className="w-3 h-3" /> {job.type}</span>
+                          <span className="inline-flex items-center gap-1 border border-border px-2 py-0.5 rounded-md"><MapPin className="w-3 h-3" /> {job.location}</span>
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="py-4 space-y-4">
+                        <div>
+                          <h4 className="font-semibold text-sm mb-2">{isAr ? 'وصف الوظيفة' : 'Job Description'}</h4>
+                          <p className="text-sm text-muted-foreground leading-relaxed">{job.description}</p>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-sm mb-2">{isAr ? 'المتطلبات الأساسية' : 'Requirements'}</h4>
+                          <ul className={`text-sm text-muted-foreground space-y-1 list-disc ${isAr ? 'pr-4' : 'pl-4'}`}>
+                            {job.requirements.map((req, idx) => (
+                              <li key={idx}>{req}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                      <div className="flex justify-end pt-4 border-t border-border/30">
+                        <Button className="w-full sm:w-auto rounded-[8px]">{isAr ? 'قدم الآن' : 'Apply Now'}</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </motion.div>
             ))}

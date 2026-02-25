@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, Suspense } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -39,6 +40,10 @@ const TYPE_COLOR: Record<BuildingType, string> = {
 const TYPE_LABEL: Record<BuildingType, string> = {
   hospital: 'Hospital', emergency: 'Emergency', research: 'Research',
   wellness: 'Wellness', hotel: 'Hotel', commercial: 'Commercial', admin: 'Administration',
+};
+const TYPE_LABEL_AR: Record<BuildingType, string> = {
+  hospital: 'مستشفى', emergency: 'طوارئ', research: 'أبحاث',
+  wellness: 'عافية', hotel: 'فندق', commercial: 'تجاري', admin: 'إدارة',
 };
 const TYPE_ICON: Record<BuildingType, React.ElementType> = {
   hospital: Stethoscope, emergency: AlertTriangle, research: FlaskConical,
@@ -362,22 +367,28 @@ const CameraController: React.FC<{ userPos: { x: number; z: number }; isNavigati
 
 /* ─── Legend ─── */
 const LEGEND_TYPES: BuildingType[] = ['hospital', 'emergency', 'research', 'wellness', 'hotel', 'commercial', 'admin'];
-const Legend: React.FC = () => (
-  <div className="absolute bottom-4 right-4 z-20 backdrop-blur-xl bg-white/80 border border-white/50 rounded-xl p-3 shadow-lg">
-    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1"><Layers className="w-3 h-3" />Legend</p>
-    <div className="flex flex-col gap-1">
-      {LEGEND_TYPES.map(t => (
-        <div key={t} className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm shrink-0" style={{ background: TYPE_COLOR[t] }} />
-          <span className="text-[10px] text-foreground/80 font-medium">{TYPE_LABEL[t]}</span>
-        </div>
-      ))}
+const Legend: React.FC = () => {
+  const { t, language } = useLanguage();
+  const isAr = language === 'ar';
+  return (
+    <div className="absolute bottom-4 right-4 z-20 backdrop-blur-xl bg-white/80 border border-white/50 rounded-xl p-3 shadow-lg rtl:left-4 rtl:right-auto rtl:text-right">
+      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1"><Layers className="w-3 h-3" />{t('map.legend')}</p>
+      <div className="flex flex-col gap-1">
+        {LEGEND_TYPES.map(t => (
+          <div key={t} className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-sm shrink-0" style={{ background: TYPE_COLOR[t] }} />
+            <span className="text-[10px] text-foreground/80 font-medium">{isAr ? TYPE_LABEL_AR[t] : TYPE_LABEL[t]}</span>
+          </div>
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 /* ─── Building Info Panel (right side) ─── */
 const InfoPanel: React.FC<{ building: BuildingData; onClose: () => void; onNavigate: (b: BuildingData) => void }> = ({ building, onClose, onNavigate }) => {
+  const { t, language } = useLanguage();
+  const isAr = language === 'ar';
   const Icon = TYPE_ICON[building.type];
   const color = TYPE_COLOR[building.type];
   return (
@@ -393,17 +404,17 @@ const InfoPanel: React.FC<{ building: BuildingData; onClose: () => void; onNavig
             <Icon className="w-5 h-5" style={{ color }} />
           </div>
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color }}>{TYPE_LABEL[building.type]}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color }}>{isAr ? TYPE_LABEL_AR[building.type] : TYPE_LABEL[building.type]}</p>
             <h3 className="text-sm font-bold text-foreground leading-tight">{building.shortName}</h3>
           </div>
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <MapPin className="w-3 h-3" />
-          <span>{building.wing === 'west' ? 'West Wing' : building.wing === 'east' ? 'East Wing' : 'Central Campus'}</span>
+          <span>{building.wing === 'west' ? (isAr ? 'الجناح الغربي' : 'West Wing') : building.wing === 'east' ? (isAr ? 'الجناح الشرقي' : 'East Wing') : (isAr ? 'الحرم المركزي' : 'Central Campus')}</span>
           <span className="mx-1">•</span>
-          <span>{building.floors} Floor{building.floors > 1 ? 's' : ''}</span>
+          <span>{building.floors} {isAr ? 'طوابق' : (building.floors > 1 ? 'Floors' : 'Floor')}</span>
           <span className="mx-1">•</span>
-          <span>Bldg {building.id}</span>
+          <span>{t('map.bldg')} {building.id}</span>
         </div>
       </div>
       {/* Body */}
@@ -411,13 +422,13 @@ const InfoPanel: React.FC<{ building: BuildingData; onClose: () => void; onNavig
         <p className="text-xs text-muted-foreground leading-relaxed">{building.description}</p>
         {/* Contact */}
         <div className="space-y-2">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Contact</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t('map.contact')}</p>
           <div className="flex items-center gap-2 text-xs"><Phone className="w-3.5 h-3.5 text-muted-foreground" /><span>{building.phone}</span></div>
           <div className="flex items-center gap-2 text-xs"><Clock className="w-3.5 h-3.5 text-muted-foreground" /><span>{building.hours}</span></div>
         </div>
         {/* Services */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Services</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">{t('map.services')}</p>
           <div className="flex flex-wrap gap-1.5">
             {building.services.map(s => (
               <span key={s} className="px-2 py-0.5 rounded-full text-[10px] font-medium border" style={{ background: `${color}12`, borderColor: `${color}30`, color }}>
@@ -427,13 +438,12 @@ const InfoPanel: React.FC<{ building: BuildingData; onClose: () => void; onNavig
           </div>
         </div>
       </div>
-      {/* Navigate button */}
       <div className="p-4 border-t border-border/30">
         <button onClick={() => onNavigate(building)}
           className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold transition-opacity hover:opacity-90"
           style={{ background: color }}>
           <Navigation className="w-4 h-4" />
-          Navigate Here
+          {isAr ? 'انتقل إلى هنا' : 'Navigate Here'}
         </button>
       </div>
     </motion.div>
@@ -541,7 +551,8 @@ const CampusMapPage: React.FC = () => {
       <div className="relative h-screen pt-16">
         {/* ─── 3D Canvas ─── */}
         <Canvas shadows camera={{ position: [0, 60, 80], fov: 45 }} className="absolute inset-0"
-          gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
+          dpr={[1, 1.5]}
+          gl={{ antialias: false, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.1, powerPreference: "high-performance", preserveDrawingBuffer: true }}
           style={{ background: 'linear-gradient(180deg,#c8dae8 0%,#e8dcc8 60%,#d4c8a8 100%)' }}>
           <Suspense fallback={null}>
             <ambientLight intensity={0.5} color="#f0e8d8" />
@@ -603,13 +614,13 @@ const CampusMapPage: React.FC = () => {
               className="absolute top-24 left-1/2 -translate-x-1/2 z-40 w-full max-w-sm px-4">
               <div className="backdrop-blur-xl bg-white/95 border border-white/50 rounded-2xl p-5 shadow-2xl text-center relative overflow-hidden">
                 <Badge variant="outline" className="mb-3 bg-accent/10 text-accent border-accent/20">
-                  <Video className="w-3 h-3 mr-1" /> Virtual Tour
+                  <Video className="w-3 h-3 mr-1" /> {t('map.virtualTour')}
                 </Badge>
                 <h3 className="text-lg font-bold text-foreground mb-2">{buildings[tourIndex]?.name}</h3>
                 <p className="text-xs text-muted-foreground mb-5 line-clamp-2">{buildings[tourIndex]?.description}</p>
                 <div className="flex gap-3 justify-center">
                   <button onClick={() => setTourIndex(i => (i - 1 + buildings.length) % buildings.length)} className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80"><ChevronLeft className="w-4 h-4 text-foreground" /></button>
-                  <button onClick={() => { setIsVirtualTour(false); resetNavigation(); }} className="px-6 rounded-full bg-destructive text-destructive-foreground font-semibold text-xs hover:bg-destructive/90 shadow-lg shadow-destructive/20">End Tour</button>
+                  <button onClick={() => { setIsVirtualTour(false); resetNavigation(); }} className="px-6 rounded-full bg-destructive text-destructive-foreground font-semibold text-xs hover:bg-destructive/90 shadow-lg shadow-destructive/20">{t('map.endTour')}</button>
                   <button onClick={() => setTourIndex(i => (i + 1) % buildings.length)} className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80"><ChevronRight className="w-4 h-4 text-foreground" /></button>
                 </div>
               </div>
@@ -625,10 +636,10 @@ const CampusMapPage: React.FC = () => {
             <button onClick={() => navigateTo(buildings[3])}
               className="flex items-center gap-2 px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-600 transition-colors mb-1">
               <AlertTriangle className="w-4 h-4" />
-              <span className="text-xs font-bold">Emergency</span>
+              <span className="text-xs font-bold">{t('map.emergency')}</span>
             </button>
             <div className="border-t border-border/30 my-1 pt-1">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-3 mb-1">Filter</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-3 mb-1">{t('map.filter')}</p>
             </div>
             {categories.map(cat => {
               const Icon = cat.icon; return (
@@ -644,18 +655,18 @@ const CampusMapPage: React.FC = () => {
               <button onClick={() => { setIsVirtualTour(true); setTourIndex(0); setShowDirectory(false); }}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary transition-all w-full mb-1">
                 <Video className="w-3.5 h-3.5" />
-                <span className="text-xs font-bold">Virtual Tour</span>
+                <span className="text-xs font-bold">{t('map.virtualTour')}</span>
               </button>
               <button onClick={() => setShowDirectory(d => !d)}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/40 text-muted-foreground hover:text-foreground transition-all w-full">
                 <List className="w-3.5 h-3.5" />
-                <span className="text-xs font-medium">Directory</span>
+                <span className="text-xs font-medium">{t('map.directory')}</span>
                 <ChevronDown className={`w-3 h-3 ml-auto transition-transform ${showDirectory ? 'rotate-180' : ''}`} />
               </button>
               <button onClick={resetNavigation}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/40 text-muted-foreground hover:text-foreground transition-all w-full">
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span className="text-xs font-medium">Reset</span>
+                <span className="text-xs font-medium">{t('map.reset')}</span>
               </button>
             </div>
           </div>
@@ -665,11 +676,11 @@ const CampusMapPage: React.FC = () => {
         <AnimatePresence>
           {showDirectory && (
             <motion.div initial={{ x: -320, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -320, opacity: 0 }} transition={{ type: 'spring', damping: 25 }}
-              className="absolute left-0 md:left-[175px] top-16 bottom-0 z-20 w-72 backdrop-blur-xl bg-white/85 border-r border-white/50 shadow-xl flex flex-col">
+              className={`absolute top-16 bottom-0 z-20 w-72 backdrop-blur-xl bg-white/85 shadow-xl flex flex-col ${isAr ? 'right-0 md:right-[175px] border-l' : 'left-0 md:left-[175px] border-r'} border-white/50`}>
               <div className="flex items-center justify-between px-4 py-3 border-b border-border/30">
-                <h3 className="text-sm font-bold">Campus Directory</h3>
+                <h3 className="text-sm font-bold">{t('map.campusDirectory')}</h3>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">{filteredBuildings.length} buildings</span>
+                  <span className="text-xs text-muted-foreground">{filteredBuildings.length} {isAr ? 'مبنى' : 'buildings'}</span>
                   <button onClick={() => setShowDirectory(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
                 </div>
               </div>
@@ -726,8 +737,8 @@ const CampusMapPage: React.FC = () => {
                     {navigatingTo.id}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold truncate">Navigating to {navigatingTo.shortName}</p>
-                    <p className="text-xs text-muted-foreground">{Math.round(totalProgress * 100)}% complete</p>
+                    <p className="text-sm font-semibold truncate">{isAr ? `التوجه إلى ${navigatingTo.shortName}` : `Navigating to ${navigatingTo.shortName}`}</p>
+                    <p className="text-xs text-muted-foreground">{isAr ? `مكتمل بنسبة ${Math.round(totalProgress * 100)}%` : `${Math.round(totalProgress * 100)}% complete`}</p>
                   </div>
                   <button onClick={() => setIsWalking(p => !p)}
                     className="w-9 h-9 rounded-full border border-primary/30 bg-primary/10 text-primary flex items-center justify-center">
@@ -752,17 +763,17 @@ const CampusMapPage: React.FC = () => {
             <motion.div initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
               className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 w-full max-w-sm px-4">
               <div className="backdrop-blur-xl bg-white/90 border border-white/50 rounded-2xl p-4 shadow-xl text-center">
-                <p className="text-sm font-bold text-foreground mb-0.5">✅ Arrived at {navigatingTo.shortName}</p>
+                <p className="text-sm font-bold text-foreground mb-0.5">✅ {isAr ? `وصلت إلى ${navigatingTo.shortName}` : `Arrived at ${navigatingTo.shortName}`}</p>
                 <p className="text-xs text-muted-foreground mb-3">{navigatingTo.hours}</p>
                 <div className="flex gap-2">
                   <button onClick={() => { setSelectedBuilding(navigatingTo); setNavigatingTo(null); setArrived(false); }}
                     className="flex-1 py-2 rounded-xl text-xs font-semibold border border-border hover:bg-muted transition-colors">
-                    View Info
+                    {isAr ? 'عرض المعلومات' : 'View Info'}
                   </button>
                   <button onClick={resetNavigation}
                     className="flex-1 py-2 rounded-xl text-xs font-semibold text-white transition-opacity hover:opacity-80"
                     style={{ background: TYPE_COLOR[navigatingTo.type] }}>
-                    Done
+                    {isAr ? 'تم' : 'Done'}
                   </button>
                 </div>
               </div>
@@ -777,15 +788,15 @@ const CampusMapPage: React.FC = () => {
         <div className="md:hidden absolute bottom-24 left-4 right-4 z-20 flex gap-2">
           <button onClick={() => navigateTo(buildings[3])}
             className="flex-[0.8] backdrop-blur-xl bg-red-500/80 border border-red-400/50 rounded-xl py-2.5 flex items-center justify-center gap-1.5 text-white">
-            <AlertTriangle className="w-4 h-4" /><span className="text-[11px] font-bold">ER</span>
+            <AlertTriangle className="w-4 h-4" /><span className="text-[11px] font-bold">{isAr ? 'طوارئ' : 'ER'}</span>
           </button>
           <button onClick={() => { setIsVirtualTour(true); setTourIndex(0); setShowDirectory(false); }}
             className="flex-1 backdrop-blur-xl bg-primary/90 border border-primary/50 rounded-xl py-2.5 flex items-center justify-center gap-1.5 text-white">
-            <Video className="w-4 h-4" /><span className="text-[11px] font-bold">Tour</span>
+            <Video className="w-4 h-4" /><span className="text-[11px] font-bold">{t('map.tour')}</span>
           </button>
           <button onClick={() => setShowDirectory(d => !d)}
             className="flex-1 backdrop-blur-xl bg-white/70 border border-white/50 rounded-xl py-2.5 flex items-center justify-center gap-1.5">
-            <List className="w-4 h-4 text-foreground" /><span className="text-[11px] font-semibold">Directory</span>
+            <List className="w-4 h-4 text-foreground" /><span className="text-[11px] font-semibold">{t('map.directory')}</span>
           </button>
           <button onClick={resetNavigation}
             className="backdrop-blur-xl bg-white/70 border border-white/50 rounded-xl px-3 py-2.5 flex items-center justify-center">

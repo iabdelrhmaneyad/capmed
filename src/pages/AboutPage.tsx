@@ -29,11 +29,11 @@ const AboutPage: React.FC = () => {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-background">
       <Header />
-      
+
       <section className="page-hero">
         <div className="container mx-auto px-6 relative z-10 text-center">
           <motion.p initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-            className="text-secondary text-xs font-semibold uppercase tracking-[0.2em] mb-3">About CapitalMed</motion.p>
+            className="text-secondary text-xs font-semibold uppercase tracking-[0.2em] mb-3">{t('misc.aboutCapitalMed')}</motion.p>
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
             className="text-4xl md:text-5xl font-bold text-white mb-4">{t('about.page.title')}</motion.h1>
           <motion.p initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}

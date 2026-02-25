@@ -42,22 +42,21 @@ const LocationPage: React.FC = () => {
         </section>
         <section className="container mx-auto px-6 py-16">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            className="relative rounded-xl overflow-hidden shadow-lg max-w-4xl mx-auto mb-4">
+            className="relative rounded-xl overflow-hidden shadow-lg max-w-4xl mx-auto mb-4 bg-muted/20">
             <iframe
               src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=%D8%A7%D9%84%D9%85%D8%AF%D9%8A%D9%86%D9%87+%D8%A7%D9%84%D8%B7%D8%A8%D9%8A%D9%87+%D9%83%D8%A7%D8%A8%D9%8A%D8%AA%D8%A7%D9%84+%D9%85%D9%8A%D8%AF,Badr,Cairo&zoom=14&maptype=roadmap"
               width="100%"
-              height="500"
-              style={{ border: 0 }}
+              height="100%"
+              style={{ border: 0, minHeight: '350px' }}
               allowFullScreen
-              loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="CapitalMed Location"
+              title={`${t('misc.capitalMed')} Location`}
               className="w-full h-[350px] md:h-[500px]"
             />
             {/* Highlight overlay badge */}
             <div className="absolute top-4 left-4 bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 z-10">
               <MapPin className="w-4 h-4" />
-              <span className="text-sm font-bold">CapitalMed</span>
+              <span className="text-sm font-bold">{t('misc.capitalMed')}</span>
             </div>
           </motion.div>
           {/* CapitalMed Location Info */}
@@ -66,15 +65,15 @@ const LocationPage: React.FC = () => {
               <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-md">
                 <MapPin className="w-6 h-6 text-primary-foreground" />
               </div>
-              <div className="text-center">
-                <h3 className="text-lg font-bold text-foreground">CapitalMed Healthcare City</h3>
-                <p className="text-sm text-muted-foreground font-medium">المدينة الطبية «كابيتال ميد» المهندسين</p>
+              <div className="flex flex-col">
+                <h3 className="text-lg font-bold text-foreground">{t('misc.capitalMedCity')}</h3>
+                <p className="text-sm text-muted-foreground mt-1">Badr City, Cairo Governorate, Egypt</p>
                 <p className="text-xs text-muted-foreground mt-1">4Q43+XG9, طريق, Badr, Cairo Governorate 4956010</p>
               </div>
             </div>
           </div>
           <div className="flex justify-center gap-4 mb-16">
-            <a href="https://www.google.com/maps/search/%D8%A7%D9%84%D9%85%D8%AF%D9%8A%D9%86%D9%87+%D8%A7%D9%84%D8%B7%D8%A8%D9%8A%D9%87+%D9%83%D8%A7%D8%A8%D9%8A%D8%AA%D8%A7%D9%84+%D9%85%D9%8A%D8%AF,+Badr,+Cairo" target="_blank" rel="noopener noreferrer"><Button size="lg" className="rounded-[8px]"><MapPin className="w-4 h-4 mr-2" />{t('location.directions')}</Button></a>
+            <a href="https://www.google.com/maps/search/%D8%A7%D9%84%D9%85%D8%AF%D9%8A%D9%86%D9%87+%D8%A7%D9%84%D8%B7%D9%8A%D9%87+%D9%83%D8%A7%D8%A8%D9%8A%D8%AA%D8%A7%D9%84+%D9%85%D9%8A%D8%AF,+Badr,+Cairo" target="_blank" rel="noopener noreferrer"><Button size="lg" className="rounded-[8px]"><MapPin className="w-4 h-4 mr-2" />{t('location.directions')}</Button></a>
             <a href="https://www.google.com/maps/@30.074,31.738,1500m/data=!3m1!1e3" target="_blank" rel="noopener noreferrer"><Button size="lg" variant="outline" className="rounded-[8px]">{t('location.satellite')}</Button></a>
           </div>
           <div className="grid md:grid-cols-2 gap-5 max-w-2xl mx-auto mb-20">
