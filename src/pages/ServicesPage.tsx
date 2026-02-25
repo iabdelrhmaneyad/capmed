@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Heart, Brain, Stethoscope, Baby, Bone, Eye, 
+import {
+  Heart, Brain, Stethoscope, Baby, Bone, Eye,
   Pill, Syringe, Activity, Microscope, Ribbon, Ear,
   ArrowRight, AlertTriangle
 } from 'lucide-react';
@@ -9,6 +9,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
+import heroImage2 from '@/assets/hero-hospital-interior.jpg';
 
 const stagger = {
   hidden: {},
@@ -40,7 +41,7 @@ const ServicesPage: React.FC = () => {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-background">
       <Header />
-      
+
       {/* Hero with staggered animations */}
       <section className="page-hero">
         <div className="container mx-auto px-6 relative z-10 text-center">
@@ -116,7 +117,7 @@ const ServicesPage: React.FC = () => {
             </motion.div>
             <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }}
               className="aspect-video rounded-xl overflow-hidden bg-white/5 border border-white/10">
-              <img src="/placeholder.svg" alt="Emergency" className="w-full h-full object-cover opacity-50" />
+              <img src={heroImage2} alt="Emergency" className="w-full h-full object-cover opacity-80" />
             </motion.div>
           </div>
         </div>

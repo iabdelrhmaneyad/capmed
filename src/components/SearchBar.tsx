@@ -284,10 +284,10 @@ const SearchBar: React.FC = () => {
                     key={page.href}
                     value={`${page.title} ${page.titleAr} ${page.keywords.join(' ')} ${page.description || ''} ${page.descriptionAr || ''}`}
                     onSelect={() => handleSelect(page.href, isAr ? page.titleAr : page.title)}
-                    className="cursor-pointer group"
+                    className="cursor-pointer group flex items-center"
                   >
                     <div className={`flex items-center justify-center w-7 h-7 rounded-lg mr-2.5 shrink-0 ${page.color}`}>
-                      <Icon className="h-3.5 w-3.5" />
+                      <Icon className="h-4 w-4" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium leading-none">
