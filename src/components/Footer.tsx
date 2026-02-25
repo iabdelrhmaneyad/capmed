@@ -1,6 +1,7 @@
 import React from 'react';
 import { MapPin, Phone, Mail, Clock, Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Link } from 'react-router-dom';
 import capitalmedLogo from '@/assets/logo_background_white.png';
 
 const Footer: React.FC = () => {
@@ -64,11 +65,18 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="font-semibold text-sm uppercase tracking-wider mb-6">{t('footer.quicklinks')}</h3>
             <ul className="space-y-3">
-              {quickLinks.map((link, index) => (
+              {[
+                { label: t('nav.about'), href: '/about' },
+                { label: t('nav.services'), href: '/services' },
+                { label: t('nav.doctors'), href: '/doctors' },
+                { label: t('nav.patients'), href: '/medical-tourism' },
+                { label: t('nav.research'), href: '/research' },
+                { label: t('nav.contact'), href: '/contact' },
+              ].map((link, index) => (
                 <li key={index}>
-                  <a href="#" className="text-white/60 hover:text-white text-sm transition-colors">
-                    {link}
-                  </a>
+                  <Link to={link.href} className="text-white/60 hover:text-white text-sm transition-colors">
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -79,17 +87,17 @@ const Footer: React.FC = () => {
             <h3 className="font-semibold text-sm uppercase tracking-wider mb-6">{t('footer.services')}</h3>
             <ul className="space-y-3">
               {[
-                t('services.emergency.title'),
-                t('services.surgery.title'),
-                t('services.cardiology.title'),
-                t('services.oncology.title'),
-                t('services.neurology.title'),
-                t('services.pediatrics.title'),
+                { label: t('services.emergency.title'), href: '/services' },
+                { label: t('services.surgery.title'), href: '/services' },
+                { label: t('services.cardiology.title'), href: '/services' },
+                { label: t('services.oncology.title'), href: '/services' },
+                { label: t('services.neurology.title'), href: '/services' },
+                { label: t('services.pediatrics.title'), href: '/services' },
               ].map((service, index) => (
                 <li key={index}>
-                  <a href="#" className="text-white/60 hover:text-white text-sm transition-colors">
-                    {service}
-                  </a>
+                  <Link to={service.href} className="text-white/60 hover:text-white text-sm transition-colors">
+                    {service.label}
+                  </Link>
                 </li>
               ))}
             </ul>
