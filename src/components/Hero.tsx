@@ -139,7 +139,7 @@ const Hero: React.FC = () => {
       </div>
 
       {/* Slide Navigation */}
-      <div className="absolute bottom-20 md:bottom-8 left-0 right-0 md:left-auto md:right-8 flex items-center justify-center md:justify-end gap-3 z-20 px-6 pointer-events-none">
+      <div className="absolute bottom-28 md:bottom-8 left-0 right-0 md:left-auto md:right-8 flex items-center justify-center md:justify-end gap-3 z-20 px-6 pointer-events-none">
         <button onClick={prevSlide} className="pointer-events-auto w-12 h-12 rounded-full border-2 border-white/30 flex items-center justify-center text-white/80 hover:text-white hover:border-white/60 hover:bg-white/10 transition-all cursor-pointer active:scale-95 shrink-0">
           <ChevronLeft className="w-5 h-5" />
         </button>

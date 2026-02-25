@@ -164,16 +164,16 @@ const SearchBar: React.FC = () => {
       {/* ── Command palette dialog ── */}
       <CommandDialog open={open} onOpenChange={setOpen}>
         {/* Header strip */}
-        <div className="flex items-center gap-2 px-3 pt-3 pb-1">
-          <div className="flex items-center gap-1.5 flex-1">
+        <div className="flex flex-wrap items-center gap-2 px-3 pt-3 pb-1">
+          <div className="flex items-center gap-1.5 flex-1 min-w-0">
             <div className="flex items-center gap-1 p-1 rounded-lg bg-primary/10">
               <Search className="w-4 h-4 text-primary" />
             </div>
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest whitespace-nowrap">
               {isAr ? 'البحث' : 'Quick Search'}
             </span>
           </div>
-          <div className="flex gap-1">
+          <div className="flex items-center gap-1 shrink-0">
             {(['all', 'pages', 'doctors'] as FilterTab[]).map((tab) => (
               <button
                 key={tab}
@@ -188,6 +188,13 @@ const SearchBar: React.FC = () => {
                     (isAr ? 'أطباء' : 'Doctors')}
               </button>
             ))}
+            <div className="w-px h-4 bg-border mx-1 shrink-0" />
+            <button
+              onClick={() => setOpen(false)}
+              className="p-1 rounded-md text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors shrink-0"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
