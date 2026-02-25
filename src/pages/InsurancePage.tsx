@@ -38,8 +38,8 @@ const InsurancePage: React.FC = () => {
               className="text-lg text-white/60 max-w-2xl mx-auto mb-8">{t('insurance.hero.subtitle')}</motion.p>
             <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}
               className="flex justify-center gap-4">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-[8px]">{t('insurance.check')}</Button>
-              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 rounded-[8px]">{t('insurance.billing')}</Button>
+              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-[8px] px-8 h-12 text-sm font-semibold shadow-lg shadow-accent/30">{t('insurance.check')}</Button>
+              <Button size="lg" className="bg-white text-foreground hover:bg-white/90 rounded-[8px] px-8 h-12 text-sm font-semibold border-0">{t('insurance.billing')}</Button>
             </motion.div>
           </div>
         </section>
