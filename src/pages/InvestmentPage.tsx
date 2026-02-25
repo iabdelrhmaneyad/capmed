@@ -30,7 +30,7 @@ const InvestmentPage: React.FC = () => {
       <Header />
       <main>
         <section className="page-hero">
-          <div className="container mx-auto px-6 relative z-10 text-center">
+          <div className="container mx-auto px-4 md:px-6 relative z-10 text-center">
             <motion.p initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
               className="text-secondary text-xs font-semibold uppercase tracking-[0.2em] mb-3">{t('investment.hero.label')}</motion.p>
             <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
@@ -38,15 +38,15 @@ const InvestmentPage: React.FC = () => {
             <motion.p initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
               className="text-lg text-white/60 max-w-2xl mx-auto mb-8">{t('investment.hero.subtitle')}</motion.p>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
-              className="flex justify-center gap-8 flex-wrap">
+              className="flex justify-center gap-6 sm:gap-8 flex-wrap">
               {stats.map((s, i) => (<div key={i} className="text-center"><p className="text-2xl font-bold text-white">{s.value}</p><p className="text-xs text-white/50">{s.label}</p></div>))}
             </motion.div>
           </div>
         </section>
-        <section className="container mx-auto px-6 py-16">
+        <section className="container mx-auto px-4 md:px-6 py-10 md:py-16">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
             className="rounded-xl overflow-hidden shadow-lg max-w-3xl mx-auto mb-20">
-            <img src={adminBuilding} alt="CapitalMed Campus" className="w-full h-[350px] object-cover" />
+            <img src={adminBuilding} alt="CapitalMed Campus" className="w-full h-48 sm:h-64 md:h-[350px] object-cover" />
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
             <h2 className="section-title">{t('investment.opportunities.title')}</h2>
@@ -75,11 +75,11 @@ const InvestmentPage: React.FC = () => {
             ))}
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            className="bg-primary/5 border border-primary/15 rounded-xl p-10 text-center">
-            <h2 className="text-2xl font-bold mb-5">{t('investment.cta.title')}</h2>
-            <div className="flex justify-center gap-4">
-              <Link to="/contact"><Button size="lg" className="rounded-[8px]">{t('investment.cta.visit')}</Button></Link>
-              <Button size="lg" variant="outline" className="rounded-[8px]">{t('investment.cta.download')}</Button>
+            className="bg-primary/5 border border-primary/15 rounded-xl p-6 md:p-10 text-center">
+            <h2 className="text-xl md:text-2xl font-bold mb-5">{t('investment.cta.title')}</h2>
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4">
+              <Link to="/contact" className="w-full sm:w-auto"><Button size="lg" className="rounded-[8px] w-full sm:w-auto">{t('investment.cta.visit')}</Button></Link>
+              <Button size="lg" variant="outline" className="rounded-[8px] w-full sm:w-auto">{t('investment.cta.download')}</Button>
             </div>
           </motion.div>
         </section>
