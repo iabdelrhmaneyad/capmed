@@ -312,7 +312,7 @@ const Tree: React.FC<{ position: [number, number, number]; scale?: number }> = (
 const Vegetation: React.FC = () => (
   <group>
     {([-50, -48, -52, -45, -8, 5, 8, -5, 70, 72, 68, 74, -55, -52, 10, 28, 48, 65, -35, -15] as number[]).map((x, i) => (
-      <Tree key={i} position={[x, 0, [−30,−5,15,35,−38,−40,38,35,−10,5,20,−30,0,25,25,18,18,12,38,35][i]]} scale={0.8}/>
+      <Tree key={i} position={[x, 0, [-30, -5, 15, 35, -38, -40, 38, 35, -10, 5, 20, -30, 0, 25, 25, 18, 18, 12, 38, 35][i]]} scale={0.8} />
     ))}
   </group>
 );
