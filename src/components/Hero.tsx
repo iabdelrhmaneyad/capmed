@@ -105,7 +105,7 @@ const Hero: React.FC = () => {
               </Button>
             </Link>
             <Link to="/about">
-              <Button size="lg" className="bg-white text-primary hover:bg-white/90 rounded-[8px] px-8 h-12 text-sm font-semibold border-0">
+              <Button size="lg" className="bg-white text-foreground hover:bg-white/90 rounded-[8px] px-8 h-12 text-sm font-semibold border-0">
                 {t('hero.cta.learn')}
               </Button>
             </Link>
@@ -148,9 +148,8 @@ const Hero: React.FC = () => {
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${
-                index === currentSlide ? 'w-8 bg-accent' : 'w-3 bg-white/40 hover:bg-white/60'
-              }`}
+              className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${index === currentSlide ? 'w-8 bg-accent' : 'w-3 bg-white/40 hover:bg-white/60'
+                }`}
             />
           ))}
         </div>

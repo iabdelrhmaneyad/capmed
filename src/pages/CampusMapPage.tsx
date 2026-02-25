@@ -4,9 +4,9 @@ import { OrbitControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Search, Navigation, MapPin, X, Play, Pause, RotateCcw, ChevronRight,
+  Search, Navigation, MapPin, X, Play, Pause, RotateCcw, ChevronRight, ChevronLeft,
   Building2, Stethoscope, AlertTriangle, Clock, Phone, Heart, FlaskConical,
-  Hotel, ShoppingBag, Shield, List, ChevronDown, Info, Layers
+  Hotel, ShoppingBag, Shield, List, ChevronDown, Info, Layers, Video
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -456,6 +456,8 @@ const CampusMapPage: React.FC = () => {
   const [currentSegment, setCurrentSegment] = useState(0);
   const [segmentProgress, setSegmentProgress] = useState(0);
   const [navigationPath, setNavigationPath] = useState<{ x: number; z: number }[]>([]);
+  const [isVirtualTour, setIsVirtualTour] = useState(false);
+  const [tourIndex, setTourIndex] = useState(0);
   const animRef = useRef<number>(0);
   const lastTimeRef = useRef(0);
 
@@ -514,7 +516,21 @@ const CampusMapPage: React.FC = () => {
   const resetNavigation = () => {
     cancelAnimationFrame(animRef.current); setNavigatingTo(null); setArrived(false);
     setIsWalking(false); setNavigationPath([]); setUserPos({ x: 0, z: 42 });
+    setIsVirtualTour(false);
   };
+
+  useEffect(() => {
+    if (isVirtualTour && buildings.length > 0) {
+      const b = buildings[tourIndex];
+      setUserPos({ x: b.x, z: b.z + 15 });
+      setNavigatingTo(b);
+      setSelectedBuilding(null);
+      const timer = setTimeout(() => {
+        setTourIndex(i => (i + 1) % buildings.length);
+      }, 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [isVirtualTour, tourIndex]);
 
   const totalSegments = navigationPath.length - 1;
   const totalProgress = totalSegments > 0 ? (currentSegment + segmentProgress) / totalSegments : 0;
@@ -558,7 +574,7 @@ const CampusMapPage: React.FC = () => {
             {searchQuery && <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2"><X className="w-4 h-4 text-muted-foreground" /></button>}
           </div>
           <AnimatePresence>
-            {searchResults.length > 0 && (
+            {searchResults.length > 0 && !isVirtualTour && (
               <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
                 className="mt-2 backdrop-blur-xl bg-white/90 border border-white/60 rounded-xl overflow-hidden shadow-xl max-h-72 overflow-y-auto">
                 {searchResults.map(b => {
@@ -579,6 +595,27 @@ const CampusMapPage: React.FC = () => {
             )}
           </AnimatePresence>
         </motion.div>
+
+        {/* ─── Virtual Tour Overlay ─── */}
+        <AnimatePresence>
+          {isVirtualTour && (
+            <motion.div initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -50, opacity: 0 }}
+              className="absolute top-24 left-1/2 -translate-x-1/2 z-40 w-full max-w-sm px-4">
+              <div className="backdrop-blur-xl bg-white/95 border border-white/50 rounded-2xl p-5 shadow-2xl text-center relative overflow-hidden">
+                <Badge variant="outline" className="mb-3 bg-accent/10 text-accent border-accent/20">
+                  <Video className="w-3 h-3 mr-1" /> Virtual Tour
+                </Badge>
+                <h3 className="text-lg font-bold text-foreground mb-2">{buildings[tourIndex]?.name}</h3>
+                <p className="text-xs text-muted-foreground mb-5 line-clamp-2">{buildings[tourIndex]?.description}</p>
+                <div className="flex gap-3 justify-center">
+                  <button onClick={() => setTourIndex(i => (i - 1 + buildings.length) % buildings.length)} className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80"><ChevronLeft className="w-4 h-4 text-foreground" /></button>
+                  <button onClick={() => { setIsVirtualTour(false); resetNavigation(); }} className="px-6 rounded-full bg-destructive text-destructive-foreground font-semibold text-xs hover:bg-destructive/90 shadow-lg shadow-destructive/20">End Tour</button>
+                  <button onClick={() => setTourIndex(i => (i + 1) % buildings.length)} className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80"><ChevronRight className="w-4 h-4 text-foreground" /></button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ─── Left Sidebar: Categories + Quick Access ─── */}
         <motion.div initial={{ x: -80, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.5 }}
@@ -604,6 +641,11 @@ const CampusMapPage: React.FC = () => {
               );
             })}
             <div className="border-t border-border/30 mt-1 pt-1">
+              <button onClick={() => { setIsVirtualTour(true); setTourIndex(0); setShowDirectory(false); }}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary transition-all w-full mb-1">
+                <Video className="w-3.5 h-3.5" />
+                <span className="text-xs font-bold">Virtual Tour</span>
+              </button>
               <button onClick={() => setShowDirectory(d => !d)}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/40 text-muted-foreground hover:text-foreground transition-all w-full">
                 <List className="w-3.5 h-3.5" />
@@ -734,12 +776,16 @@ const CampusMapPage: React.FC = () => {
         {/* ─── Mobile bottom bar ─── */}
         <div className="md:hidden absolute bottom-24 left-4 right-4 z-20 flex gap-2">
           <button onClick={() => navigateTo(buildings[3])}
-            className="flex-1 backdrop-blur-xl bg-red-500/80 border border-red-400/50 rounded-xl py-2.5 flex items-center justify-center gap-1.5 text-white">
-            <AlertTriangle className="w-4 h-4" /><span className="text-xs font-bold">Emergency</span>
+            className="flex-[0.8] backdrop-blur-xl bg-red-500/80 border border-red-400/50 rounded-xl py-2.5 flex items-center justify-center gap-1.5 text-white">
+            <AlertTriangle className="w-4 h-4" /><span className="text-[11px] font-bold">ER</span>
+          </button>
+          <button onClick={() => { setIsVirtualTour(true); setTourIndex(0); setShowDirectory(false); }}
+            className="flex-1 backdrop-blur-xl bg-primary/90 border border-primary/50 rounded-xl py-2.5 flex items-center justify-center gap-1.5 text-white">
+            <Video className="w-4 h-4" /><span className="text-[11px] font-bold">Tour</span>
           </button>
           <button onClick={() => setShowDirectory(d => !d)}
             className="flex-1 backdrop-blur-xl bg-white/70 border border-white/50 rounded-xl py-2.5 flex items-center justify-center gap-1.5">
-            <List className="w-4 h-4 text-foreground" /><span className="text-xs font-semibold">Directory</span>
+            <List className="w-4 h-4 text-foreground" /><span className="text-[11px] font-semibold">Directory</span>
           </button>
           <button onClick={resetNavigation}
             className="backdrop-blur-xl bg-white/70 border border-white/50 rounded-xl px-3 py-2.5 flex items-center justify-center">
