@@ -534,6 +534,8 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.en': 'English',
     'lang.fr': 'Français',
     'lang.de': 'Deutsch',
+    'hero.smartCity': 'Smart Healthcare City',
+    'hero.navigateCampus': 'Navigate Campus',
   },
   ar: {
     // Navigation
@@ -567,6 +569,8 @@ const translations: Record<Language, Record<string, string>> = {
     'hero.stats.specialties': '+١٠٠ تخصص طبي',
     'hero.cta.doctor': 'ابحث عن طبيب',
     'hero.cta.learn': 'اعرف المزيد',
+    'hero.smartCity': 'مدينة الرعاية الصحية الذكية',
+    'hero.navigateCampus': 'تصفح الحرم',
 
     // Quick Actions
     'quick.title': 'ربما تبحث عن',

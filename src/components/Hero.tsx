@@ -64,7 +64,7 @@ const Hero: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="text-secondary text-sm font-semibold uppercase tracking-[0.2em] mb-4"
           >
-            Smart Healthcare City
+            {t('hero.smartCity')}
           </motion.p>
 
           <motion.h1
@@ -103,7 +103,7 @@ const Hero: React.FC = () => {
             <Link to="/campus-map" className="w-full sm:w-auto">
               <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-[8px] px-8 h-12 text-sm font-semibold w-full sm:w-auto">
                 <MapPin className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                Navigate Campus
+                {t('hero.navigateCampus')}
               </Button>
             </Link>
             <Link to="/about" className="w-full sm:w-auto">
