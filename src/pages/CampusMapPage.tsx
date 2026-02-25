@@ -3,71 +3,162 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Navigation, MapPin, X, Play, Pause, RotateCcw, ChevronRight, Building2, Stethoscope, AlertTriangle, Clock } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import {
+  Search, Navigation, MapPin, X, Play, Pause, RotateCcw, ChevronRight,
+  Building2, Stethoscope, AlertTriangle, Clock, Phone, Heart, FlaskConical,
+  Hotel, ShoppingBag, Shield, List, ChevronDown, Info, Layers
+} from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import Header from '@/components/Header';
 
-/* ───────── Data ───────── */
-const buildings = [
-  { id: 1, name: 'Rehabilitation, Cosmetics & Wellness Institute', shortName: 'Rehab & Wellness', x: -38, z: 18, w: 18, d: 14, floors: 3, wing: 'west', shape: 'L' as const },
-  { id: 2, name: 'UHC Phase 1 – 220 Beds, 36 Outpatient Clinics', shortName: 'UHC Phase 1', x: -30, z: 4, w: 22, d: 16, floors: 5, wing: 'west', shape: 'U' as const },
-  { id: 3, name: 'University Hospital Center – 332 Beds', shortName: 'University Hospital', x: -36, z: -14, w: 26, d: 20, floors: 7, wing: 'west', shape: 'U' as const },
-  { id: 4, name: 'Emergency & Trauma Center', shortName: 'Emergency Center', x: -10, z: -16, w: 16, d: 12, floors: 4, wing: 'center', shape: 'rect' as const },
-  { id: 5, name: 'Central Command Administration', shortName: 'Administration', x: -4, z: -28, w: 12, d: 10, floors: 3, wing: 'center', shape: 'rect' as const },
-  { id: 6, name: 'CapitalMed Hotel', shortName: 'Medical Hotel', x: -42, z: 30, w: 14, d: 12, floors: 6, wing: 'west', shape: 'rect' as const },
-  { id: 7, name: 'Central Utility Building', shortName: 'Utilities', x: -6, z: -4, w: 10, d: 8, floors: 2, wing: 'center', shape: 'rect' as const },
-  { id: 8, name: 'La Plaza Commercial Mall', shortName: 'La Plaza Mall', x: -30, z: -28, w: 18, d: 12, floors: 2, wing: 'west', shape: 'L' as const },
-  { id: 9, name: 'Neurosciences Institute', shortName: 'Neurosciences', x: 14, z: -28, w: 16, d: 12, floors: 4, wing: 'east', shape: 'rect' as const },
-  { id: 10, name: 'Urinary Diseases & Urosurgery', shortName: 'Urology', x: 14, z: -14, w: 16, d: 12, floors: 4, wing: 'east', shape: 'L' as const },
-  { id: 11, name: 'Cardiopulmonary Institute', shortName: 'Cardiopulmonary', x: 14, z: -2, w: 16, d: 12, floors: 5, wing: 'east', shape: 'rect' as const },
-  { id: 12, name: 'Hepatobiliary & Gastroenterology', shortName: 'Gastroenterology', x: 34, z: -28, w: 16, d: 12, floors: 4, wing: 'east', shape: 'rect' as const },
-  { id: 13, name: 'Advanced Medical Research', shortName: 'Research Lab', x: 34, z: -14, w: 16, d: 12, floors: 4, wing: 'east', shape: 'L' as const },
-  { id: 14, name: 'Oncology Institute', shortName: 'Oncology', x: 34, z: -2, w: 16, d: 12, floors: 5, wing: 'east', shape: 'U' as const },
-  { id: 15, name: 'Children & Women Institute', shortName: "Children & Women", x: 54, z: -26, w: 16, d: 16, floors: 5, wing: 'east', shape: 'U' as const },
-  { id: 16, name: 'Assisted Living Facilities', shortName: 'Assisted Living', x: 54, z: -10, w: 16, d: 12, floors: 3, wing: 'east', shape: 'rect' as const },
-  { id: 17, name: 'Behavioral & Mental Health', shortName: 'Mental Health', x: 54, z: 4, w: 16, d: 12, floors: 3, wing: 'east', shape: 'rect' as const },
-  { id: 18, name: 'Geriatric Health Care', shortName: 'Geriatrics', x: 34, z: 10, w: 16, d: 10, floors: 3, wing: 'east', shape: 'rect' as const },
-  { id: 19, name: 'Dental Institute', shortName: 'Dental', x: 14, z: 10, w: 12, d: 10, floors: 2, wing: 'east', shape: 'rect' as const },
+/* ─── Types ─── */
+type BuildingType = 'hospital' | 'emergency' | 'research' | 'wellness' | 'hotel' | 'commercial' | 'admin';
+
+interface BuildingData {
+  id: number; name: string; shortName: string;
+  x: number; z: number; w: number; d: number; floors: number;
+  wing: 'west' | 'east' | 'center';
+  shape: 'rect' | 'L' | 'U';
+  type: BuildingType;
+  phone: string; hours: string;
+  description: string;
+  services: string[];
+}
+
+/* ─── Color map by type ─── */
+const TYPE_COLOR: Record<BuildingType, string> = {
+  hospital: '#2563eb',
+  emergency: '#dc2626',
+  research: '#7c3aed',
+  wellness: '#059669',
+  hotel: '#d97706',
+  commercial: '#db2777',
+  admin: '#475569',
+};
+const TYPE_LABEL: Record<BuildingType, string> = {
+  hospital: 'Hospital', emergency: 'Emergency', research: 'Research',
+  wellness: 'Wellness', hotel: 'Hotel', commercial: 'Commercial', admin: 'Administration',
+};
+const TYPE_ICON: Record<BuildingType, React.ElementType> = {
+  hospital: Stethoscope, emergency: AlertTriangle, research: FlaskConical,
+  wellness: Heart, hotel: Hotel, commercial: ShoppingBag, admin: Building2,
+};
+
+/* ─── Building Data ─── */
+const buildings: BuildingData[] = [
+  {
+    id: 1, name: 'Rehabilitation, Cosmetics & Wellness Institute', shortName: 'Rehab & Wellness', x: -38, z: 18, w: 18, d: 14, floors: 3, wing: 'west', shape: 'L', type: 'wellness',
+    phone: '+20-2-1234-5601', hours: 'Sun–Thu 8AM–8PM', description: 'A dedicated wellness hub offering rehabilitation therapy, cosmetic procedures, and holistic recovery programs.',
+    services: ['Physical Therapy', 'Cosmetic Surgery', 'Hydrotherapy', 'Occupational Therapy']
+  },
+  {
+    id: 2, name: 'UHC Phase 1 – 220 Beds, 36 Outpatient Clinics', shortName: 'UHC Phase 1', x: -30, z: 4, w: 22, d: 16, floors: 5, wing: 'west', shape: 'U', type: 'hospital',
+    phone: '+20-2-1234-5602', hours: '24/7', description: 'First phase of the University Hospital Complex hosting outpatient clinics and inpatient wards across 5 floors.',
+    services: ['General Surgery', 'Internal Medicine', 'Outpatient Clinics', 'Radiology']
+  },
+  {
+    id: 3, name: 'University Hospital Center – 332 Beds', shortName: 'University Hospital', x: -36, z: -14, w: 26, d: 20, floors: 7, wing: 'west', shape: 'U', type: 'hospital',
+    phone: '+20-2-1234-5603', hours: '24/7', description: 'The flagship hospital tower with 332 beds and a full spectrum of tertiary care services.',
+    services: ['ICU', 'Surgical Suites', 'Labor & Delivery', 'Imaging Center', 'Pharmacy']
+  },
+  {
+    id: 4, name: 'Emergency & Trauma Center', shortName: 'Emergency Center', x: -10, z: -16, w: 16, d: 12, floors: 4, wing: 'center', shape: 'rect', type: 'emergency',
+    phone: '123', hours: '24/7 – Always Open', description: 'Level I Trauma Center with helicopter landing pad, rapid-response teams, and a full resuscitation suite.',
+    services: ['Trauma Resuscitation', 'Helicopter Pad', 'Poison Control', 'Rapid Response Team']
+  },
+  {
+    id: 5, name: 'Central Command Administration', shortName: 'Administration', x: -4, z: -28, w: 12, d: 10, floors: 3, wing: 'center', shape: 'rect', type: 'admin',
+    phone: '+20-2-1234-5605', hours: 'Sun–Thu 9AM–5PM', description: 'Campus-wide administration, patient services, HR, and executive leadership offices.',
+    services: ['Patient Services', 'HR Office', 'Finance', 'Executive Offices']
+  },
+  {
+    id: 6, name: 'CapitalMed Hotel', shortName: 'Medical Hotel', x: -42, z: 30, w: 14, d: 12, floors: 6, wing: 'west', shape: 'rect', type: 'hotel',
+    phone: '+20-2-1234-5606', hours: '24/7', description: 'On-campus luxury hotel designed for patients\' families and international medical tourists, steps from clinical care.',
+    services: ['Concierge', 'Restaurant', 'Spa', 'Free Shuttle', 'Medical Concierge']
+  },
+  {
+    id: 7, name: 'Central Utility Building', shortName: 'Utilities', x: -6, z: -4, w: 10, d: 8, floors: 2, wing: 'center', shape: 'rect', type: 'admin',
+    phone: '+20-2-1234-5607', hours: '24/7', description: 'Houses campus power, HVAC, water treatment and medical gas systems.',
+    services: ['Power Plant', 'HVAC Control', 'Water Treatment', 'Medical Gases']
+  },
+  {
+    id: 8, name: 'La Plaza Commercial Mall', shortName: 'La Plaza Mall', x: -30, z: -28, w: 18, d: 12, floors: 2, wing: 'west', shape: 'L', type: 'commercial',
+    phone: '+20-2-1234-5608', hours: 'Daily 9AM–10PM', description: 'Campus retail promenade with pharmacy, cafes, bank, gift shops, and essential services.',
+    services: ['Pharmacy', 'Cafés & Restaurants', 'Bank & ATM', 'Gift Shop', 'Clothing']
+  },
+  {
+    id: 9, name: 'Neurosciences Institute', shortName: 'Neurosciences', x: 14, z: -28, w: 16, d: 12, floors: 4, wing: 'east', shape: 'rect', type: 'hospital',
+    phone: '+20-2-1234-5609', hours: '24/7', description: 'Specialized center for brain, spine and neurological conditions with advanced imaging and surgical suites.',
+    services: ['Neurosurgery', 'Epilepsy Clinic', 'Spine Center', 'Neuroimaging']
+  },
+  {
+    id: 10, name: 'Urinary Diseases & Urosurgery', shortName: 'Urology', x: 14, z: -14, w: 16, d: 12, floors: 4, wing: 'east', shape: 'L', type: 'hospital',
+    phone: '+20-2-1234-5610', hours: 'Sun–Fri 8AM–10PM', description: 'Comprehensive urology services from minimally-invasive laparoscopy to robotic-assisted surgery.',
+    services: ['Robotic Surgery', 'Kidney Stone Clinic', 'Urodynamics', 'Laparoscopy']
+  },
+  {
+    id: 11, name: 'Cardiopulmonary Institute', shortName: 'Cardiopulmonary', x: 14, z: -2, w: 16, d: 12, floors: 5, wing: 'east', shape: 'rect', type: 'hospital',
+    phone: '+20-2-1234-5611', hours: '24/7', description: 'Advanced heart and lung care including cardiac catheterization labs and pulmonary function testing.',
+    services: ['Cath Lab', 'Cardiac Rehab', 'Pulmonology', 'Cardiac ICU', 'Echocardiography']
+  },
+  {
+    id: 12, name: 'Hepatobiliary & Gastroenterology', shortName: 'Gastroenterology', x: 34, z: -28, w: 16, d: 12, floors: 4, wing: 'east', shape: 'rect', type: 'hospital',
+    phone: '+20-2-1234-5612', hours: 'Sun–Fri 8AM–8PM', description: 'Expert diagnosis and treatment of liver, gallbladder, pancreas, and digestive tract conditions.',
+    services: ['Endoscopy', 'Liver Transplant', 'Bariatric Surgery', 'Colonoscopy']
+  },
+  {
+    id: 13, name: 'Advanced Medical Research', shortName: 'Research Lab', x: 34, z: -14, w: 16, d: 12, floors: 4, wing: 'east', shape: 'L', type: 'research',
+    phone: '+20-2-1234-5613', hours: 'Sun–Thu 8AM–6PM', description: 'State-of-the-art research facility housing biobanks, genomics labs, and clinical trial coordination.',
+    services: ['Genomics Lab', 'Biobank', 'Clinical Trials', 'AI Diagnostics', 'Publications']
+  },
+  {
+    id: 14, name: 'Oncology Institute', shortName: 'Oncology', x: 34, z: -2, w: 16, d: 12, floors: 5, wing: 'east', shape: 'U', type: 'hospital',
+    phone: '+20-2-1234-5614', hours: '24/7', description: 'Comprehensive cancer care with radiation therapy, chemotherapy suites, and a dedicated palliative care unit.',
+    services: ['Radiation Therapy', 'Chemotherapy', 'Bone Marrow Transplant', 'Palliative Care']
+  },
+  {
+    id: 15, name: 'Children & Women Institute', shortName: "Children & Women", x: 54, z: -26, w: 16, d: 16, floors: 5, wing: 'east', shape: 'U', type: 'hospital',
+    phone: '+20-2-1234-5615', hours: '24/7', description: 'Child-friendly hospital with pediatric specialties, NICU, and a full obstetrics and gynecology department.',
+    services: ['NICU', 'Pediatric Surgery', 'Obstetrics', 'Gynecology', 'Child Development']
+  },
+  {
+    id: 16, name: 'Assisted Living Facilities', shortName: 'Assisted Living', x: 54, z: -10, w: 16, d: 12, floors: 3, wing: 'east', shape: 'rect', type: 'wellness',
+    phone: '+20-2-1234-5616', hours: '24/7', description: 'Long-term assisted living for seniors and post-surgical patients requiring ongoing support.',
+    services: ['24/7 Nursing', 'Physiotherapy', 'Social Activities', 'Nutritional Meals']
+  },
+  {
+    id: 17, name: 'Behavioral & Mental Health', shortName: 'Mental Health', x: 54, z: 4, w: 16, d: 12, floors: 3, wing: 'east', shape: 'rect', type: 'wellness',
+    phone: '+20-2-1234-5617', hours: '24/7', description: 'Compassionate psychiatric and psychological care in a serene, private environment.',
+    services: ['Psychiatry', 'Counseling', 'Addiction Recovery', 'Group Therapy', 'Crisis Line']
+  },
+  {
+    id: 18, name: 'Geriatric Health Care', shortName: 'Geriatrics', x: 34, z: 10, w: 16, d: 10, floors: 3, wing: 'east', shape: 'rect', type: 'hospital',
+    phone: '+20-2-1234-5618', hours: 'Sun–Fri 8AM–8PM', description: 'Specialized care for older adults addressing age-related conditions with dignity and respect.',
+    services: ['Memory Clinic', 'Falls Prevention', 'Chronic Disease Mgmt', 'Palliative Care']
+  },
+  {
+    id: 19, name: 'Dental Institute', shortName: 'Dental', x: 14, z: 10, w: 12, d: 10, floors: 2, wing: 'east', shape: 'rect', type: 'hospital',
+    phone: '+20-2-1234-5619', hours: 'Sun–Thu 8AM–6PM', description: 'Full-service dental center offering everything from routine cleanings to complex oral surgery.',
+    services: ['Orthodontics', 'Oral Surgery', 'Cosmetic Dentistry', 'Pediatric Dentistry']
+  },
 ];
 
-type BuildingData = typeof buildings[number];
-
-const mainRoad = [
-  { x: 0, z: 42 },
-  { x: 0, z: 35 },
-  { x: 0, z: 28 },
-  { x: 0, z: 20 },
-  { x: 0, z: 12 },
-  { x: 0, z: 4 },
-  { x: 0, z: -4 },
-  { x: 0, z: -12 },
-  { x: 0, z: -20 },
-  { x: 0, z: -28 },
-  { x: 0, z: -36 },
-];
-
+/* ─── Path helpers ─── */
+const mainRoad = Array.from({ length: 11 }, (_, i) => ({ x: 0, z: 42 - i * 8 }));
 function getPathToBuilding(b: BuildingData) {
-  const tx = b.x + b.w / 2;
-  const tz = b.z + b.d / 2;
+  const tx = b.x + b.w / 2, tz = b.z + b.d / 2;
   let ci = 0, cd = Infinity;
   mainRoad.forEach((p, i) => { const d = Math.abs(p.z - tz); if (d < cd) { cd = d; ci = i; } });
   const path: { x: number; z: number }[] = [];
-  for (let i = 0; i <= ci; i++) path.push(mainRoad[i]);
+  for (let i = 0; i <= ci; i++)path.push(mainRoad[i]);
   path.push({ x: tx, z: mainRoad[ci].z });
   path.push({ x: tx, z: tz });
   return path;
 }
-
 function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
 
-const categories = [
-  { icon: Building2, label: 'Directory', filter: 'all' },
-  { icon: Stethoscope, label: 'Medical', filter: 'medical' },
-  { icon: AlertTriangle, label: 'Emergency', filter: 'emergency' },
-];
-
-/* ───────── 3D Building Component ───────── */
+/* ─── 3D Materials ─── */
 const FLOOR_H = 1.6;
 const concreteMat = new THREE.MeshStandardMaterial({ color: '#c8c0b8', roughness: 0.85, metalness: 0.05 });
 const stoneMat = new THREE.MeshStandardMaterial({ color: '#d4cdc4', roughness: 0.9, metalness: 0.02 });
@@ -75,408 +166,283 @@ const glassMat = new THREE.MeshPhysicalMaterial({ color: '#88aabb', roughness: 0
 const darkMat = new THREE.MeshStandardMaterial({ color: '#6b7280', roughness: 0.7, metalness: 0.1 });
 const canopyMat = new THREE.MeshStandardMaterial({ color: '#e8e4de', roughness: 0.6, metalness: 0.15 });
 const roofEquipMat = new THREE.MeshStandardMaterial({ color: '#8a8a8a', roughness: 0.5, metalness: 0.4 });
+const asphaltMat = new THREE.MeshStandardMaterial({ color: '#555', roughness: 0.8, metalness: 0.05 });
+const curbMat = new THREE.MeshStandardMaterial({ color: '#999', roughness: 0.7 });
 
-interface Building3DProps {
-  data: BuildingData;
-  isSelected: boolean;
-  isTarget: boolean;
-  arrived: boolean;
-  onClick: () => void;
-}
-
-const Building3D: React.FC<Building3DProps> = React.memo(({ data, isSelected, isTarget, arrived, onClick }) => {
-  const groupRef = useRef<THREE.Group>(null);
+/* ─── Building3D ─── */
+interface B3DProps { data: BuildingData; isSelected: boolean; isTarget: boolean; arrived: boolean; onClick: () => void; }
+const Building3D: React.FC<B3DProps> = React.memo(({ data, isSelected, isTarget, arrived, onClick }) => {
   const pulseRef = useRef<THREE.Mesh>(null);
   const h = data.floors * FLOOR_H;
   const { w, d } = data;
+  const typeColor = TYPE_COLOR[data.type];
 
   useFrame((_, delta) => {
     if (pulseRef.current && arrived && isTarget) {
-      pulseRef.current.scale.x += delta * 3;
-      pulseRef.current.scale.z += delta * 3;
+      pulseRef.current.scale.x += delta * 3; pulseRef.current.scale.z += delta * 3;
       const mat = pulseRef.current.material as THREE.MeshBasicMaterial;
       mat.opacity -= delta * 0.5;
-      if (mat.opacity <= 0) {
-        pulseRef.current.scale.set(1, 1, 1);
-        mat.opacity = 0.4;
-      }
+      if (mat.opacity <= 0) { pulseRef.current.scale.set(1, 1, 1); mat.opacity = 0.4; }
     }
   });
 
-  // Build multi-volume composition
+  const accentMat = useMemo(() => new THREE.MeshStandardMaterial({ color: typeColor, roughness: 0.4, metalness: 0.3 }), [typeColor]);
+
   const volumes = useMemo(() => {
     const vols: { px: number; pz: number; vw: number; vd: number; vh: number; mat: 'concrete' | 'stone' | 'glass' }[] = [];
-
     if (data.shape === 'U') {
-      // Main back bar
       vols.push({ px: 0, pz: -d * 0.35, vw: w, vd: d * 0.3, vh: h, mat: 'concrete' });
-      // Left wing
       vols.push({ px: -w * 0.35, pz: d * 0.1, vw: w * 0.3, vd: d * 0.7, vh: h * 0.85, mat: 'stone' });
-      // Right wing
       vols.push({ px: w * 0.35, pz: d * 0.1, vw: w * 0.3, vd: d * 0.7, vh: h * 0.85, mat: 'stone' });
-      // Glass connector
       vols.push({ px: 0, pz: d * 0.35, vw: w * 0.4, vd: d * 0.15, vh: h * 0.5, mat: 'glass' });
     } else if (data.shape === 'L') {
-      // Main bar
       vols.push({ px: -w * 0.15, pz: 0, vw: w * 0.7, vd: d, vh: h, mat: 'concrete' });
-      // Extension
       vols.push({ px: w * 0.3, pz: -d * 0.25, vw: w * 0.4, vd: d * 0.5, vh: h * 0.75, mat: 'stone' });
-      // Glass link
       vols.push({ px: w * 0.1, pz: -d * 0.15, vw: w * 0.15, vd: d * 0.3, vh: h * 0.55, mat: 'glass' });
     } else {
-      // Main volume with setback
       vols.push({ px: 0, pz: 0, vw: w * 0.85, vd: d * 0.85, vh: h, mat: 'concrete' });
-      // Recessed facade section
       vols.push({ px: w * 0.1, pz: d * 0.3, vw: w * 0.5, vd: d * 0.2, vh: h * 0.7, mat: 'glass' });
-      // Side accent
       vols.push({ px: -w * 0.35, pz: 0, vw: w * 0.15, vd: d * 0.6, vh: h * 0.6, mat: 'stone' });
     }
-
     return vols;
   }, [data.shape, w, d, h]);
 
-  const getMat = (type: string) => {
-    if (type === 'glass') return glassMat;
-    if (type === 'stone') return stoneMat;
-    return concreteMat;
-  };
+  const getMat = (t: string) => { if (t === 'glass') return glassMat; if (t === 'stone') return stoneMat; return concreteMat; };
 
   return (
-    <group ref={groupRef} position={[data.x + w / 2, 0, data.z + d / 2]} onClick={(e) => { e.stopPropagation(); onClick(); }}>
-      {/* Building volumes */}
+    <group position={[data.x + w / 2, 0, data.z + d / 2]} onClick={(e) => { e.stopPropagation(); onClick(); }}>
       {volumes.map((v, i) => (
         <group key={i} position={[v.px, v.vh / 2, v.pz]}>
           <mesh castShadow receiveShadow material={getMat(v.mat)}>
             <boxGeometry args={[v.vw, v.vh, v.vd]} />
           </mesh>
-
-          {/* Window grid overlay (front face) */}
           {v.mat !== 'glass' && (
-            <>
-              {/* Front windows */}
-              <mesh position={[0, 0, v.vd / 2 + 0.02]}>
-                <planeGeometry args={[v.vw * 0.9, v.vh * 0.85]} />
-                <meshStandardMaterial color="#6899aa" roughness={0.1} metalness={0.4} transparent opacity={0.3} />
-              </mesh>
-              {/* Window mullions - horizontal */}
-              {Array.from({ length: Math.floor(v.vh / FLOOR_H) }).map((_, fi) => (
-                <mesh key={`wh${fi}`} position={[0, -v.vh / 2 + (fi + 1) * FLOOR_H, v.vd / 2 + 0.03]}>
-                  <planeGeometry args={[v.vw * 0.92, 0.08]} />
-                  <meshStandardMaterial color="#9a9590" roughness={0.7} />
-                </mesh>
-              ))}
-              {/* Window mullions - vertical */}
-              {Array.from({ length: Math.max(2, Math.floor(v.vw / 3)) }).map((_, vi) => {
-                const spacing = v.vw * 0.9 / (Math.max(2, Math.floor(v.vw / 3)) + 1);
-                return (
-                  <mesh key={`wv${vi}`} position={[-v.vw * 0.45 + spacing * (vi + 1), 0, v.vd / 2 + 0.03]}>
-                    <planeGeometry args={[0.06, v.vh * 0.88]} />
-                    <meshStandardMaterial color="#9a9590" roughness={0.7} />
-                  </mesh>
-                );
-              })}
-              {/* Side windows */}
-              <mesh position={[v.vw / 2 + 0.02, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
-                <planeGeometry args={[v.vd * 0.85, v.vh * 0.8]} />
-                <meshStandardMaterial color="#6899aa" roughness={0.1} metalness={0.4} transparent opacity={0.25} />
-              </mesh>
-            </>
+            <mesh position={[0, v.vh / 2 + 0.18, 0]} material={accentMat}>
+              <boxGeometry args={[v.vw + 0.1, 0.35, v.vd + 0.1]} />
+            </mesh>
           )}
-
-          {/* Parapet */}
-          <mesh position={[0, v.vh / 2, 0]} castShadow material={darkMat}>
-            <boxGeometry args={[v.vw + 0.3, 0.3, v.vd + 0.3]} />
+          <mesh position={[0, v.vh / 2 + 0.01, 0]} castShadow material={darkMat}>
+            <boxGeometry args={[v.vw + 0.3, 0.25, v.vd + 0.3]} />
           </mesh>
         </group>
       ))}
-
-      {/* Entrance canopy */}
       <mesh position={[0, 1.8, d * 0.5 + 1]} castShadow material={canopyMat}>
         <boxGeometry args={[w * 0.35, 0.15, 2.5]} />
       </mesh>
-      {/* Canopy pillars */}
       {[-w * 0.12, w * 0.12].map((cx, ci) => (
         <mesh key={ci} position={[cx, 0.9, d * 0.5 + 2]} castShadow material={darkMat}>
           <cylinderGeometry args={[0.12, 0.12, 1.8, 8]} />
         </mesh>
       ))}
-
-      {/* Roof equipment (HVAC) */}
       {data.floors >= 4 && (
-        <>
-          <mesh position={[w * 0.2, h + 0.5, -d * 0.15]} castShadow material={roofEquipMat}>
-            <boxGeometry args={[2.5, 1, 2]} />
-          </mesh>
-          <mesh position={[-w * 0.15, h + 0.3, d * 0.1]} castShadow material={roofEquipMat}>
-            <boxGeometry args={[1.5, 0.6, 1.5]} />
-          </mesh>
-        </>
+        <mesh position={[w * 0.2, h * data.floors * FLOOR_H / 2 + 0.5, -d * 0.15]} castShadow material={roofEquipMat}>
+          <boxGeometry args={[2.5, 1, 2]} />
+        </mesh>
       )}
-
-      {/* Selection / target highlight ring */}
       {(isSelected || isTarget) && (
         <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <ringGeometry args={[Math.max(w, d) * 0.55, Math.max(w, d) * 0.6, 48]} />
-          <meshBasicMaterial color={isTarget ? '#00b4e5' : '#0088cc'} transparent opacity={0.5} />
+          <meshBasicMaterial color={isTarget ? '#00b4e5' : '#0088cc'} transparent opacity={0.6} />
         </mesh>
       )}
-
-      {/* Arrival pulse */}
       {arrived && isTarget && (
         <mesh ref={pulseRef} position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <ringGeometry args={[Math.max(w, d) * 0.5, Math.max(w, d) * 0.55, 48]} />
           <meshBasicMaterial color="#00b4e5" transparent opacity={0.4} />
         </mesh>
       )}
-
-      {/* Floating label using Html for reliable rendering */}
-      <Html position={[0, h + 2, 0]} center distanceFactor={60} style={{ pointerEvents: 'none' }}>
+      <Html position={[0, h + 2.2, 0]} center distanceFactor={60} style={{ pointerEvents: 'none' }}>
         <div style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-          <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.6)', fontFamily: 'Montserrat, sans-serif' }}>
+          <div style={{
+            fontSize: '12px', fontWeight: 700, color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.7)', fontFamily: 'Inter,sans-serif',
+            background: typeColor + 'cc', borderRadius: 4, padding: '1px 6px', backdropFilter: 'blur(4px)'
+          }}>
             {data.shortName}
-          </div>
-          <div style={{ fontSize: '9px', color: '#ccc', textShadow: '0 1px 3px rgba(0,0,0,0.5)', fontFamily: 'Montserrat, sans-serif' }}>
-            Building {data.id}
           </div>
         </div>
       </Html>
     </group>
   );
 });
-
 Building3D.displayName = 'Building3D';
 
-/* ───────── Ground ───────── */
-const Ground: React.FC = () => {
-  const groundMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#c4b494',
-    roughness: 0.95,
-    metalness: 0,
-  }), []);
+/* ─── Ground / Roads / Trees ─── */
+const Ground: React.FC = () => (
+  <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]} receiveShadow>
+    <planeGeometry args={[200, 200]} />
+    <meshStandardMaterial color="#c4b494" roughness={0.95} />
+  </mesh>
+);
 
-  return (
-    <>
-      {/* Main ground plane */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]} receiveShadow material={groundMat}>
-        <planeGeometry args={[200, 200]} />
+const Roads: React.FC = () => (
+  <group>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]} receiveShadow material={asphaltMat}>
+      <planeGeometry args={[6, 90]} />
+    </mesh>
+    {Array.from({ length: 25 }).map((_, i) => (
+      <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.04, -42 + i * 3.5]} material={new THREE.MeshStandardMaterial({ color: '#ddd', roughness: 0.4 })}>
+        <planeGeometry args={[0.15, 1.5]} />
       </mesh>
-
-      {/* Subtle terrain patches */}
-      {[
-        { x: -30, z: -25, s: 25 },
-        { x: 40, z: 15, s: 20 },
-        { x: -20, z: 30, s: 18 },
-        { x: 55, z: -20, s: 22 },
-      ].map((p, i) => (
-        <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[p.x, -0.03, p.z]} receiveShadow>
-          <circleGeometry args={[p.s, 32]} />
-          <meshStandardMaterial color="#baa882" roughness={1} transparent opacity={0.3} />
-        </mesh>
-      ))}
-    </>
-  );
-};
-
-/* ───────── Roads ───────── */
-const asphaltMat = new THREE.MeshStandardMaterial({ color: '#555555', roughness: 0.8, metalness: 0.05 });
-const markingMat = new THREE.MeshStandardMaterial({ color: '#dddddd', roughness: 0.4 });
-const curbMat = new THREE.MeshStandardMaterial({ color: '#999999', roughness: 0.7 });
-
-const Roads: React.FC = () => {
-  return (
-    <group>
-      {/* Main road (north-south) */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]} receiveShadow material={asphaltMat}>
-        <planeGeometry args={[6, 90]} />
+    ))}
+    {[-3.1, 3.1].map((cx, ci) => (
+      <mesh key={ci} position={[cx, 0.12, 0]} material={curbMat}>
+        <boxGeometry args={[0.25, 0.25, 90]} />
       </mesh>
-      {/* Center line dashes */}
-      {Array.from({ length: 25 }).map((_, i) => (
-        <mesh key={`cl${i}`} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.04, -42 + i * 3.5]} material={markingMat}>
-          <planeGeometry args={[0.15, 1.5]} />
-        </mesh>
-      ))}
-      {/* Curbs */}
-      {[-3.1, 3.1].map((cx, ci) => (
-        <mesh key={`curb${ci}`} position={[cx, 0.12, 0]} material={curbMat}>
-          <boxGeometry args={[0.25, 0.25, 90]} />
-        </mesh>
-      ))}
-
-      {/* West side roads */}
-      {[-14, -4, 10, 24].map((z, i) => (
-        <group key={`wr${i}`}>
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-22, 0.02, z]} receiveShadow material={asphaltMat}>
-            <planeGeometry args={[40, 4]} />
-          </mesh>
-          {[-22 - 18, -22 + 18].map((cx, ci) => (
-            <mesh key={ci} position={[cx, 0.1, z]} material={curbMat}>
-              <boxGeometry args={[0.2, 0.2, 4.2]} />
-            </mesh>
-          ))}
-        </group>
-      ))}
-
-      {/* East side roads */}
-      {[-22, -8, 4, 12].map((z, i) => (
-        <group key={`er${i}`}>
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[38, 0.02, z]} receiveShadow material={asphaltMat}>
-            <planeGeometry args={[50, 4]} />
-          </mesh>
-        </group>
-      ))}
-
-      {/* Parking areas */}
-      {[
-        { x: -48, z: -14, w: 8, d: 18 },
-        { x: 68, z: -24, w: 6, d: 22 },
-      ].map((p, i) => (
-        <group key={`park${i}`}>
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[p.x, 0.015, p.z]} receiveShadow>
-            <planeGeometry args={[p.w, p.d]} />
-            <meshStandardMaterial color="#606060" roughness={0.85} />
-          </mesh>
-          {/* Parking lines */}
-          {Array.from({ length: 6 }).map((_, li) => (
-            <mesh key={li} rotation={[-Math.PI / 2, 0, 0]} position={[p.x - p.w / 2 + (li + 1) * (p.w / 7), 0.025, p.z]}>
-              <planeGeometry args={[0.08, p.d * 0.9]} />
-              <meshStandardMaterial color="#aaaaaa" roughness={0.3} />
-            </mesh>
-          ))}
-        </group>
-      ))}
-    </group>
-  );
-};
-
-/* ───────── Trees ───────── */
-const Tree: React.FC<{ position: [number, number, number]; scale?: number }> = ({ position, scale = 1 }) => {
-  const trunkMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#6b5b45', roughness: 0.9 }), []);
-  const leafMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#5a7a3a', roughness: 0.8 }), []);
-
-  return (
-    <group position={position} scale={scale}>
-      <mesh position={[0, 1.2, 0]} castShadow material={trunkMat}>
-        <cylinderGeometry args={[0.15, 0.2, 2.4, 6]} />
+    ))}
+    {[-14, -4, 10, 24].map((z, i) => (
+      <mesh key={`w${i}`} rotation={[-Math.PI / 2, 0, 0]} position={[-22, 0.02, z]} receiveShadow material={asphaltMat}>
+        <planeGeometry args={[40, 4]} />
       </mesh>
-      <mesh position={[0, 3, 0]} castShadow material={leafMat}>
-        <sphereGeometry args={[1.4, 8, 6]} />
+    ))}
+    {[-22, -8, 4, 12].map((z, i) => (
+      <mesh key={`e${i}`} rotation={[-Math.PI / 2, 0, 0]} position={[38, 0.02, z]} receiveShadow material={asphaltMat}>
+        <planeGeometry args={[50, 4]} />
       </mesh>
-      <mesh position={[0.5, 2.5, 0.3]} castShadow material={leafMat}>
-        <sphereGeometry args={[0.9, 8, 6]} />
-      </mesh>
-    </group>
-  );
-};
+    ))}
+  </group>
+);
 
-const Vegetation: React.FC = () => {
-  const trees = useMemo(() => [
-    [-50, 0, -30], [-48, 0, -5], [-52, 0, 15], [-45, 0, 35],
-    [-8, 0, -38], [5, 0, -40], [8, 0, 38], [-5, 0, 35],
-    [70, 0, -10], [72, 0, 5], [68, 0, 20], [74, 0, -30],
-    [-55, 0, 0], [-52, 0, 25], [10, 0, 25], [28, 0, 18],
-    [48, 0, 18], [65, 0, 12], [-35, 0, 38], [-15, 0, 35],
-  ] as [number, number, number][], []);
+const Tree: React.FC<{ position: [number, number, number]; scale?: number }> = ({ position, scale = 1 }) => (
+  <group position={position} scale={scale}>
+    <mesh position={[0, 1.2, 0]}><cylinderGeometry args={[0.15, 0.2, 2.4, 6]} /><meshStandardMaterial color="#6b5b45" /></mesh>
+    <mesh position={[0, 3, 0]}><sphereGeometry args={[1.4, 8, 6]} /><meshStandardMaterial color="#5a7a3a" /></mesh>
+  </group>
+);
 
-  return (
-    <group>
-      {trees.map((pos, i) => (
-        <Tree key={i} position={pos} scale={0.7 + Math.random() * 0.5} />
-      ))}
-    </group>
-  );
-};
+const Vegetation: React.FC = () => (
+  <group>
+    {([-50, -48, -52, -45, -8, 5, 8, -5, 70, 72, 68, 74, -55, -52, 10, 28, 48, 65, -35, -15] as number[]).map((x, i) => (
+      <Tree key={i} position={[x, 0, [−30,−5,15,35,−38,−40,38,35,−10,5,20,−30,0,25,25,18,18,12,38,35][i]]} scale={0.8}/>
+    ))}
+  </group>
+);
 
-/* ───────── Navigation Path 3D ───────── */
-const NavPath3D: React.FC<{ path: { x: number; z: number }[]; progress: number }> = ({ path, progress }) => {
+/* ─── Nav Path / User Marker / Camera ─── */
+const NavPath3D: React.FC<{ path: { x: number; z: number }[]; progress: number }> = ({ path, progress }) => (
+  <group>
+    {path.map((p, i) => {
+      const t = i / (path.length - 1);
+      if (t > progress) return null;
+      return <mesh key={i} position={[p.x, 0.15, p.z]}><sphereGeometry args={[0.3, 8, 8]} /><meshBasicMaterial color="#00b4e5" transparent opacity={0.6} /></mesh>;
+    })}
+  </group>
+);
 
-  if (path.length < 2) return null;
-
-  return (
-    <group>
-      {/* Glowing dots along path */}
-      {path.map((p, i) => {
-        const t = i / (path.length - 1);
-        if (t > progress) return null;
-        return (
-          <mesh key={i} position={[p.x, 0.15, p.z]}>
-            <sphereGeometry args={[0.3, 8, 8]} />
-            <meshBasicMaterial color="#00b4e5" transparent opacity={0.6} />
-          </mesh>
-        );
-      })}
-    </group>
-  );
-};
-
-/* ───────── User Marker 3D ───────── */
 const UserMarker: React.FC<{ position: { x: number; z: number } }> = ({ position }) => {
   const ringRef = useRef<THREE.Mesh>(null);
-
   useFrame((_, delta) => {
     if (ringRef.current) {
-      const s = ringRef.current.scale;
-      s.x += delta * 1.5;
-      s.z += delta * 1.5;
+      const s = ringRef.current.scale; s.x += delta * 1.5; s.z += delta * 1.5;
       const mat = ringRef.current.material as THREE.MeshBasicMaterial;
-      mat.opacity -= delta * 0.4;
-      if (mat.opacity <= 0) {
-        s.set(1, 1, 1);
-        mat.opacity = 0.5;
-      }
+      mat.opacity -= delta * 0.4; if (mat.opacity <= 0) { s.set(1, 1, 1); mat.opacity = 0.5; }
     }
   });
-
   return (
     <group position={[position.x, 0.3, position.z]}>
-      {/* Pulse ring */}
       <mesh ref={ringRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]}>
-        <ringGeometry args={[1, 1.3, 32]} />
-        <meshBasicMaterial color="#0078c8" transparent opacity={0.5} side={THREE.DoubleSide} />
+        <ringGeometry args={[1, 1.3, 32]} /><meshBasicMaterial color="#0078c8" transparent opacity={0.5} side={THREE.DoubleSide} />
       </mesh>
-      {/* Main dot */}
-      <mesh castShadow>
-        <sphereGeometry args={[0.6, 16, 16]} />
-        <meshStandardMaterial color="#0088dd" emissive="#0066aa" emissiveIntensity={0.5} roughness={0.3} />
-      </mesh>
-      {/* White border ring */}
+      <mesh castShadow><sphereGeometry args={[0.6, 16, 16]} /><meshStandardMaterial color="#0088dd" emissive="#0066aa" emissiveIntensity={0.5} roughness={0.3} /></mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
-        <ringGeometry args={[0.65, 0.85, 32]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.9} side={THREE.DoubleSide} />
+        <ringGeometry args={[0.65, 0.85, 32]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.9} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );
 };
 
-/* ───────── Camera Controller ───────── */
-const CameraController: React.FC<{ target: { x: number; z: number } | null; userPos: { x: number; z: number }; isNavigating: boolean }> = ({ target, userPos, isNavigating }) => {
-  const { camera } = useThree();
+const CameraController: React.FC<{ userPos: { x: number; z: number }; isNavigating: boolean }> = ({ userPos, isNavigating }) => {
   const controlsRef = useRef<any>(null);
-
   useFrame(() => {
     if (isNavigating && controlsRef.current) {
-      const targetX = lerp(controlsRef.current.target.x, userPos.x, 0.03);
-      const targetZ = lerp(controlsRef.current.target.z, userPos.z, 0.03);
-      controlsRef.current.target.set(targetX, 0, targetZ);
+      controlsRef.current.target.set(lerp(controlsRef.current.target.x, userPos.x, 0.03), 0, lerp(controlsRef.current.target.z, userPos.z, 0.03));
     }
   });
+  return <OrbitControls ref={controlsRef} enableDamping dampingFactor={0.08} minPolarAngle={Math.PI / 6} maxPolarAngle={Math.PI / 3} minDistance={25} maxDistance={120} enablePan panSpeed={0.8} />;
+};
 
+/* ─── Legend ─── */
+const LEGEND_TYPES: BuildingType[] = ['hospital', 'emergency', 'research', 'wellness', 'hotel', 'commercial', 'admin'];
+const Legend: React.FC = () => (
+  <div className="absolute bottom-4 right-4 z-20 backdrop-blur-xl bg-white/80 border border-white/50 rounded-xl p-3 shadow-lg">
+    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1"><Layers className="w-3 h-3" />Legend</p>
+    <div className="flex flex-col gap-1">
+      {LEGEND_TYPES.map(t => (
+        <div key={t} className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-sm shrink-0" style={{ background: TYPE_COLOR[t] }} />
+          <span className="text-[10px] text-foreground/80 font-medium">{TYPE_LABEL[t]}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+/* ─── Building Info Panel (right side) ─── */
+const InfoPanel: React.FC<{ building: BuildingData; onClose: () => void; onNavigate: (b: BuildingData) => void }> = ({ building, onClose, onNavigate }) => {
+  const Icon = TYPE_ICON[building.type];
+  const color = TYPE_COLOR[building.type];
   return (
-    <OrbitControls
-      ref={controlsRef}
-      enableDamping
-      dampingFactor={0.08}
-      minPolarAngle={Math.PI / 6}
-      maxPolarAngle={Math.PI / 3}
-      minDistance={25}
-      maxDistance={120}
-      enablePan
-      panSpeed={0.8}
-    />
+    <motion.div initial={{ x: 340, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 340, opacity: 0 }} transition={{ type: 'spring', damping: 25 }}
+      className="absolute right-0 top-16 bottom-0 z-30 w-80 backdrop-blur-xl bg-white/90 border-l border-white/50 shadow-2xl flex flex-col overflow-hidden">
+      {/* Header */}
+      <div className="p-4 border-b border-border/30 relative" style={{ background: `${color}18` }}>
+        <button onClick={onClose} className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/60 flex items-center justify-center hover:bg-white transition-colors">
+          <X className="w-3.5 h-3.5 text-muted-foreground" />
+        </button>
+        <div className="flex items-center gap-3 mb-2 pr-8">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${color}22` }}>
+            <Icon className="w-5 h-5" style={{ color }} />
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color }}>{TYPE_LABEL[building.type]}</p>
+            <h3 className="text-sm font-bold text-foreground leading-tight">{building.shortName}</h3>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <MapPin className="w-3 h-3" />
+          <span>{building.wing === 'west' ? 'West Wing' : building.wing === 'east' ? 'East Wing' : 'Central Campus'}</span>
+          <span className="mx-1">•</span>
+          <span>{building.floors} Floor{building.floors > 1 ? 's' : ''}</span>
+          <span className="mx-1">•</span>
+          <span>Bldg {building.id}</span>
+        </div>
+      </div>
+      {/* Body */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <p className="text-xs text-muted-foreground leading-relaxed">{building.description}</p>
+        {/* Contact */}
+        <div className="space-y-2">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Contact</p>
+          <div className="flex items-center gap-2 text-xs"><Phone className="w-3.5 h-3.5 text-muted-foreground" /><span>{building.phone}</span></div>
+          <div className="flex items-center gap-2 text-xs"><Clock className="w-3.5 h-3.5 text-muted-foreground" /><span>{building.hours}</span></div>
+        </div>
+        {/* Services */}
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Services</p>
+          <div className="flex flex-wrap gap-1.5">
+            {building.services.map(s => (
+              <span key={s} className="px-2 py-0.5 rounded-full text-[10px] font-medium border" style={{ background: `${color}12`, borderColor: `${color}30`, color }}>
+                {s}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+      {/* Navigate button */}
+      <div className="p-4 border-t border-border/30">
+        <button onClick={() => onNavigate(building)}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold transition-opacity hover:opacity-90"
+          style={{ background: color }}>
+          <Navigation className="w-4 h-4" />
+          Navigate Here
+        </button>
+      </div>
+    </motion.div>
   );
 };
 
-/* ───────── Main Scene ───────── */
+/* ─── Main Page ─── */
 const WALK_SPEED = 0.003;
+type CategoryFilter = 'all' | BuildingType;
 
 const CampusMapPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -484,8 +450,8 @@ const CampusMapPage: React.FC = () => {
   const [navigatingTo, setNavigatingTo] = useState<BuildingData | null>(null);
   const [userPos, setUserPos] = useState({ x: 0, z: 42 });
   const [arrived, setArrived] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [showSidebar, setShowSidebar] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<CategoryFilter>('all');
+  const [showDirectory, setShowDirectory] = useState(false);
   const [isWalking, setIsWalking] = useState(false);
   const [currentSegment, setCurrentSegment] = useState(0);
   const [segmentProgress, setSegmentProgress] = useState(0);
@@ -493,346 +459,295 @@ const CampusMapPage: React.FC = () => {
   const animRef = useRef<number>(0);
   const lastTimeRef = useRef(0);
 
-  const filteredBuildings = buildings.filter(b => {
-    const matchesSearch = b.name.toLowerCase().includes(searchQuery.toLowerCase()) || b.shortName.toLowerCase().includes(searchQuery.toLowerCase());
-    if (activeCategory === 'emergency') return b.id === 4;
-    if (activeCategory === 'medical') return ![5, 6, 7, 8].includes(b.id);
-    return matchesSearch;
-  });
+  // Grouped buildings
+  const categories = useMemo(() => {
+    const types = [...new Set(buildings.map(b => b.type))] as BuildingType[];
+    return [
+      { type: 'all' as CategoryFilter, label: 'All Buildings', count: buildings.length, icon: List, color: '#334155' },
+      ...types.map(t => ({ type: t as CategoryFilter, label: TYPE_LABEL[t], count: buildings.filter(b => b.type === t).length, icon: TYPE_ICON[t], color: TYPE_COLOR[t] }))
+    ];
+  }, []);
 
-  const searchResults = searchQuery.length > 0
-    ? buildings.filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase()) || b.shortName.toLowerCase().includes(searchQuery.toLowerCase()))
-    : [];
+  const filteredBuildings = useMemo(() => buildings.filter(b => {
+    const matchSearch = searchQuery === '' || b.name.toLowerCase().includes(searchQuery.toLowerCase()) || b.shortName.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchCat = activeCategory === 'all' || b.type === activeCategory;
+    return matchSearch && matchCat;
+  }), [searchQuery, activeCategory]);
+
+  const searchResults = useMemo(() => searchQuery.length > 0 ? buildings.filter(b =>
+    b.name.toLowerCase().includes(searchQuery.toLowerCase()) || b.shortName.toLowerCase().includes(searchQuery.toLowerCase())
+  ) : [], [searchQuery]);
 
   const navigateTo = useCallback((building: BuildingData) => {
     const path = getPathToBuilding(building);
-    setNavigationPath(path);
-    setNavigatingTo(building);
-    setArrived(false);
-    setCurrentSegment(0);
-    setSegmentProgress(0);
-    setIsWalking(true);
-    setSelectedBuilding(null);
-    setSearchQuery('');
-    setUserPos(path[0]);
+    setNavigationPath(path); setNavigatingTo(building); setArrived(false);
+    setCurrentSegment(0); setSegmentProgress(0); setIsWalking(true);
+    setSelectedBuilding(null); setSearchQuery(''); setUserPos(path[0]);
+    setShowDirectory(false);
   }, []);
 
   useEffect(() => {
     if (!isWalking || navigationPath.length < 2) return;
     const animate = (time: number) => {
       if (!lastTimeRef.current) lastTimeRef.current = time;
-      const delta = time - lastTimeRef.current;
-      lastTimeRef.current = time;
+      const delta = time - lastTimeRef.current; lastTimeRef.current = time;
       setSegmentProgress(prev => {
-        const from = navigationPath[currentSegment];
-        const to = navigationPath[currentSegment + 1];
+        const from = navigationPath[currentSegment], to = navigationPath[currentSegment + 1];
         if (!from || !to) return prev;
         const segLength = Math.sqrt((to.x - from.x) ** 2 + (to.z - from.z) ** 2);
         const speed = WALK_SPEED * (60 / Math.max(segLength, 1));
         const next = prev + speed * (delta / 16);
-        const newX = lerp(from.x, to.x, Math.min(next, 1));
-        const newZ = lerp(from.z, to.z, Math.min(next, 1));
-        setUserPos({ x: newX, z: newZ });
+        setUserPos({ x: lerp(from.x, to.x, Math.min(next, 1)), z: lerp(from.z, to.z, Math.min(next, 1)) });
         if (next >= 1) {
-          const nextSeg = currentSegment + 1;
-          if (nextSeg >= navigationPath.length - 1) {
-            setIsWalking(false);
-            setArrived(true);
-            return 0;
-          }
-          setCurrentSegment(nextSeg);
-          return 0;
+          const ns = currentSegment + 1;
+          if (ns >= navigationPath.length - 1) { setIsWalking(false); setArrived(true); return 0; }
+          setCurrentSegment(ns); return 0;
         }
         return next;
       });
       animRef.current = requestAnimationFrame(animate);
     };
-    lastTimeRef.current = 0;
-    animRef.current = requestAnimationFrame(animate);
+    lastTimeRef.current = 0; animRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animRef.current);
   }, [isWalking, currentSegment, navigationPath]);
 
   const resetNavigation = () => {
-    cancelAnimationFrame(animRef.current);
-    setNavigatingTo(null);
-    setArrived(false);
-    setIsWalking(false);
-    setNavigationPath([]);
-    setUserPos({ x: 0, z: 42 });
+    cancelAnimationFrame(animRef.current); setNavigatingTo(null); setArrived(false);
+    setIsWalking(false); setNavigationPath([]); setUserPos({ x: 0, z: 42 });
   };
 
-  const toggleWalking = () => { if (!arrived) setIsWalking(p => !p); };
   const totalSegments = navigationPath.length - 1;
   const totalProgress = totalSegments > 0 ? (currentSegment + segmentProgress) / totalSegments : 0;
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
       <Header />
       <div className="relative h-screen pt-16">
-        {/* 3D Canvas */}
-        <Canvas
-          shadows
-          camera={{ position: [0, 60, 80], fov: 45 }}
-          className="absolute inset-0"
+        {/* ─── 3D Canvas ─── */}
+        <Canvas shadows camera={{ position: [0, 60, 80], fov: 45 }} className="absolute inset-0"
           gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
-          style={{ background: 'linear-gradient(180deg, #c8dae8 0%, #e8dcc8 60%, #d4c8a8 100%)' }}
-        >
+          style={{ background: 'linear-gradient(180deg,#c8dae8 0%,#e8dcc8 60%,#d4c8a8 100%)' }}>
           <Suspense fallback={null}>
-            {/* Lighting — realistic daylight */}
             <ambientLight intensity={0.5} color="#f0e8d8" />
-            <directionalLight
-              position={[40, 60, 30]}
-              intensity={2}
-              color="#fff5e0"
-              castShadow
-              shadow-mapSize-width={2048}
-              shadow-mapSize-height={2048}
-              shadow-camera-left={-80}
-              shadow-camera-right={80}
-              shadow-camera-top={80}
-              shadow-camera-bottom={-80}
-              shadow-camera-near={1}
-              shadow-camera-far={200}
-              shadow-bias={-0.001}
-            />
+            <directionalLight position={[40, 60, 30]} intensity={2} color="#fff5e0" castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} shadow-camera-left={-80} shadow-camera-right={80} shadow-camera-top={80} shadow-camera-bottom={-80} shadow-bias={-0.001} />
             <directionalLight position={[-20, 30, -20]} intensity={0.3} color="#a8c4e0" />
             <hemisphereLight args={['#b8d0e8', '#c4b494', 0.5]} />
             <fog attach="fog" args={['#d8cfc0', 100, 220]} />
-
-            <CameraController target={navigatingTo ? { x: navigatingTo.x, z: navigatingTo.z } : null} userPos={userPos} isNavigating={!!navigatingTo && !arrived} />
-
-            <Ground />
-            <Roads />
-            <Vegetation />
-
-            {/* Buildings */}
+            <CameraController userPos={userPos} isNavigating={!!navigatingTo && !arrived} />
+            <Ground /><Roads /><Vegetation />
             {buildings.map(b => (
-              <Building3D
-                key={b.id}
-                data={b}
+              <Building3D key={b.id} data={b}
                 isSelected={selectedBuilding?.id === b.id}
                 isTarget={navigatingTo?.id === b.id}
                 arrived={arrived}
-                onClick={() => setSelectedBuilding(selectedBuilding?.id === b.id ? null : b)}
-              />
+                onClick={() => setSelectedBuilding(selectedBuilding?.id === b.id ? null : b)} />
             ))}
-
-            {/* Navigation path */}
-            {navigationPath.length > 1 && (
-              <NavPath3D path={navigationPath} progress={totalProgress} />
-            )}
-
-            {/* User marker */}
+            {navigationPath.length > 1 && <NavPath3D path={navigationPath} progress={totalProgress} />}
             <UserMarker position={userPos} />
           </Suspense>
         </Canvas>
 
-        {/* ─── UI Overlays ─── */}
-
-        {/* Search Bar */}
-        <motion.div
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, type: 'spring' }}
-          className="absolute top-20 md:top-24 left-1/2 -translate-x-1/2 z-30 w-full max-w-md px-4"
-        >
-          <div className="relative backdrop-blur-xl bg-white/70 border border-white/60 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.08)]">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Enter your destination..."
-              className="w-full bg-transparent border-0 pl-12 pr-4 py-4 text-foreground placeholder:text-muted-foreground text-base focus-visible:ring-0 focus-visible:ring-offset-0"
-            />
-            {searchQuery && (
-              <button onClick={() => setSearchQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2">
-                <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
-              </button>
-            )}
+        {/* ─── Search Bar ─── */}
+        <motion.div initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3, type: 'spring' }}
+          className="absolute top-20 md:top-24 left-1/2 -translate-x-1/2 z-30 w-full max-w-md px-4">
+          <div className="relative backdrop-blur-xl bg-white/75 border border-white/60 rounded-2xl shadow-lg">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search buildings, departments..."
+              className="w-full bg-transparent border-0 pl-11 pr-10 py-3.5 text-sm focus-visible:ring-0 focus-visible:ring-offset-0" />
+            {searchQuery && <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2"><X className="w-4 h-4 text-muted-foreground" /></button>}
           </div>
           <AnimatePresence>
             {searchResults.length > 0 && (
-              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                className="mt-2 backdrop-blur-xl bg-white/90 border border-white/60 rounded-xl overflow-hidden shadow-lg max-h-64 overflow-y-auto">
-                {searchResults.map((b) => (
-                  <button key={b.id} onClick={() => navigateTo(b)}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted transition-colors text-left">
-                    <div className="w-8 h-8 rounded-lg bg-muted border border-border flex items-center justify-center text-xs font-semibold text-muted-foreground">{b.id}</div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{b.shortName}</p>
-                      <p className="text-xs text-muted-foreground">{b.wing === 'west' ? 'West Wing' : b.wing === 'east' ? 'East Wing' : 'Central'}</p>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/50 ml-auto" />
-                  </button>
-                ))}
+              <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+                className="mt-2 backdrop-blur-xl bg-white/90 border border-white/60 rounded-xl overflow-hidden shadow-xl max-h-72 overflow-y-auto">
+                {searchResults.map(b => {
+                  const Icon = TYPE_ICON[b.type]; const color = TYPE_COLOR[b.type]; return (
+                    <button key={b.id} onClick={() => navigateTo(b)} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/60 transition-colors text-left border-b border-border/20 last:border-0">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${color}18` }}>
+                        <Icon className="w-4 h-4" style={{ color }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-foreground truncate">{b.shortName}</p>
+                        <p className="text-xs text-muted-foreground truncate">{b.hours}</p>
+                      </div>
+                      <Navigation className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
+                    </button>
+                  );
+                })}
               </motion.div>
             )}
           </AnimatePresence>
         </motion.div>
 
-        {/* Sidebar */}
-        <motion.div
-          initial={{ x: -80, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 z-20 hidden md:block"
-        >
-          <div className="backdrop-blur-xl bg-white/60 border border-white/50 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] p-2 flex flex-col gap-1">
-            {categories.map((cat) => (
-              <button key={cat.label} onClick={() => { setActiveCategory(cat.filter); setShowSidebar(true); }}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all text-left min-w-[130px] ${activeCategory === cat.filter ? 'bg-white/80 shadow-sm text-foreground' : 'text-muted-foreground hover:bg-white/40 hover:text-foreground'}`}>
-                <cat.icon className="w-4 h-4" />
-                <span className="text-sm font-medium">{cat.label}</span>
-              </button>
-            ))}
-            <div className="border-t border-border/30 mt-1 pt-1">
-              <button onClick={resetNavigation} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/40 transition-all w-full">
-                <RotateCcw className="w-4 h-4" />
-                <span className="text-sm font-medium">Reset</span>
-              </button>
+        {/* ─── Left Sidebar: Categories + Quick Access ─── */}
+        <motion.div initial={{ x: -80, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.5 }}
+          className="absolute left-3 top-24 z-20 hidden md:block">
+          <div className="backdrop-blur-xl bg-white/70 border border-white/50 rounded-2xl shadow-lg p-2 flex flex-col gap-0.5 min-w-[160px]">
+            {/* Emergency quick access */}
+            <button onClick={() => navigateTo(buildings[3])}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-600 transition-colors mb-1">
+              <AlertTriangle className="w-4 h-4" />
+              <span className="text-xs font-bold">Emergency</span>
+            </button>
+            <div className="border-t border-border/30 my-1 pt-1">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-3 mb-1">Filter</p>
             </div>
-            <div className="border-t border-border/30 mt-1 pt-2 px-3 pb-1">
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <Clock className="w-3.5 h-3.5" />
-                <span className="text-xs font-medium">{timeStr}</span>
-              </div>
+            {categories.map(cat => {
+              const Icon = cat.icon; return (
+                <button key={cat.type} onClick={() => setActiveCategory(cat.type)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all text-left ${activeCategory === cat.type ? 'bg-white/80 shadow-sm' : 'hover:bg-white/40 text-muted-foreground hover:text-foreground'}`}>
+                  <Icon className="w-3.5 h-3.5 shrink-0" style={{ color: activeCategory === cat.type ? cat.color : undefined }} />
+                  <span className="text-xs font-medium flex-1">{cat.label}</span>
+                  <span className="text-[10px] text-muted-foreground/60 font-mono">{cat.count}</span>
+                </button>
+              );
+            })}
+            <div className="border-t border-border/30 mt-1 pt-1">
+              <button onClick={() => setShowDirectory(d => !d)}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/40 text-muted-foreground hover:text-foreground transition-all w-full">
+                <List className="w-3.5 h-3.5" />
+                <span className="text-xs font-medium">Directory</span>
+                <ChevronDown className={`w-3 h-3 ml-auto transition-transform ${showDirectory ? 'rotate-180' : ''}`} />
+              </button>
+              <button onClick={resetNavigation}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/40 text-muted-foreground hover:text-foreground transition-all w-full">
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span className="text-xs font-medium">Reset</span>
+              </button>
             </div>
           </div>
         </motion.div>
 
-        {/* Mobile bottom bar */}
-        <div className="md:hidden absolute bottom-4 left-4 right-4 z-20 flex gap-2">
-          {categories.map((cat) => (
-            <button key={cat.label} onClick={() => { setActiveCategory(cat.filter); setShowSidebar(true); }}
-              className="flex-1 backdrop-blur-xl bg-white/70 border border-white/50 rounded-xl py-2.5 flex flex-col items-center gap-1">
-              <cat.icon className="w-4 h-4 text-foreground" />
-              <span className="text-[10px] font-medium text-foreground">{cat.label}</span>
-            </button>
-          ))}
-          <button onClick={resetNavigation}
-            className="backdrop-blur-xl bg-white/70 border border-white/50 rounded-xl px-3 py-2.5 flex flex-col items-center gap-1">
-            <RotateCcw className="w-4 h-4 text-muted-foreground" />
-            <span className="text-[10px] font-medium text-muted-foreground">Reset</span>
-          </button>
-        </div>
-
-        {/* Directory Panel */}
+        {/* ─── Directory Panel ─── */}
         <AnimatePresence>
-          {showSidebar && (
-            <motion.div
-              initial={{ x: -320, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -320, opacity: 0 }}
-              transition={{ type: 'spring', damping: 25 }}
-              className="absolute left-0 md:left-[170px] top-20 md:top-28 bottom-16 md:bottom-8 z-20 w-full md:w-80 backdrop-blur-xl bg-white/80 border border-white/50 md:rounded-2xl overflow-hidden shadow-lg"
-            >
-              <div className="flex items-center justify-between p-4 border-b border-border/30">
-                <h3 className="font-semibold text-sm text-foreground">
-                  {activeCategory === 'emergency' ? 'Emergency' : activeCategory === 'medical' ? 'Medical Services' : 'Campus Directory'}
-                </h3>
-                <button onClick={() => setShowSidebar(false)}>
-                  <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
-                </button>
+          {showDirectory && (
+            <motion.div initial={{ x: -320, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -320, opacity: 0 }} transition={{ type: 'spring', damping: 25 }}
+              className="absolute left-0 md:left-[175px] top-16 bottom-0 z-20 w-72 backdrop-blur-xl bg-white/85 border-r border-white/50 shadow-xl flex flex-col">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border/30">
+                <h3 className="text-sm font-bold">Campus Directory</h3>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">{filteredBuildings.length} buildings</span>
+                  <button onClick={() => setShowDirectory(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
+                </div>
               </div>
-              <div className="overflow-y-auto h-full pb-20 scrollbar-thin">
-                {filteredBuildings.map((b, i) => (
-                  <motion.button key={b.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}
-                    onClick={() => { navigateTo(b); setShowSidebar(false); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/60 transition-colors text-left border-b border-border/20">
-                    <div className="w-9 h-9 rounded-lg bg-muted border border-border flex items-center justify-center text-sm font-semibold text-muted-foreground shrink-0">{b.id}</div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{b.shortName}</p>
-                      <p className="text-xs text-muted-foreground truncate">{b.name}</p>
+              <div className="overflow-y-auto flex-1 pb-4">
+                {LEGEND_TYPES.filter(t => filteredBuildings.some(b => b.type === t) || activeCategory === 'all').map(type => {
+                  const group = filteredBuildings.filter(b => b.type === type);
+                  if (!group.length) return null;
+                  const color = TYPE_COLOR[type];
+                  return (
+                    <div key={type}>
+                      <div className="flex items-center gap-2 px-4 py-2 sticky top-0 bg-white/80 backdrop-blur-sm border-b border-border/20">
+                        <div className="w-2 h-2 rounded-full" style={{ background: color }} />
+                        <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color }}>{TYPE_LABEL[type]}</p>
+                        <span className="text-[10px] text-muted-foreground ml-auto">{group.length}</span>
+                      </div>
+                      {group.map((b, i) => (
+                        <motion.button key={b.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}
+                          onClick={() => { setSelectedBuilding(b); setShowDirectory(false); }}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/60 transition-colors text-left border-b border-border/10">
+                          <div className="w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 text-white" style={{ background: color }}>
+                            {b.id}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-semibold text-foreground truncate">{b.shortName}</p>
+                            <p className="text-[10px] text-muted-foreground">{b.hours}</p>
+                          </div>
+                          <Info className="w-3 h-3 text-muted-foreground/40 shrink-0" />
+                        </motion.button>
+                      ))}
                     </div>
-                    <Navigation className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0 ml-auto" />
-                  </motion.button>
-                ))}
+                  );
+                })}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Walking Controls */}
+        {/* ─── Building Info Panel (right) ─── */}
+        <AnimatePresence>
+          {selectedBuilding && !navigatingTo && (
+            <InfoPanel building={selectedBuilding} onClose={() => setSelectedBuilding(null)} onNavigate={navigateTo} />
+          )}
+        </AnimatePresence>
+
+        {/* ─── Navigation Progress Bar ─── */}
         <AnimatePresence>
           {navigatingTo && !arrived && (
             <motion.div initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
-              className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-30 w-full max-w-sm px-4">
-              <div className="backdrop-blur-xl bg-white/80 border border-white/50 rounded-2xl p-4 shadow-lg">
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 w-full max-w-sm px-4">
+              <div className="backdrop-blur-xl bg-white/85 border border-white/50 rounded-2xl p-4 shadow-xl">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-muted border border-border flex items-center justify-center text-sm font-bold text-muted-foreground">{navigatingTo.id}</div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground truncate">Navigating to {navigatingTo.shortName}</p>
-                    <p className="text-xs text-muted-foreground">{Math.round(totalProgress * 100)}% • Walking</p>
+                  <div className="w-10 h-10 rounded-xl text-white text-sm font-bold flex items-center justify-center shrink-0"
+                    style={{ background: TYPE_COLOR[navigatingTo.type] }}>
+                    {navigatingTo.id}
                   </div>
-                  <button onClick={toggleWalking} className="w-10 h-10 rounded-full flex items-center justify-center transition-colors border border-primary/30 bg-primary/10 text-primary">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate">Navigating to {navigatingTo.shortName}</p>
+                    <p className="text-xs text-muted-foreground">{Math.round(totalProgress * 100)}% complete</p>
+                  </div>
+                  <button onClick={() => setIsWalking(p => !p)}
+                    className="w-9 h-9 rounded-full border border-primary/30 bg-primary/10 text-primary flex items-center justify-center">
                     {isWalking ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                  </button>
+                  <button onClick={resetNavigation} className="w-9 h-9 rounded-full border border-border/40 flex items-center justify-center text-muted-foreground hover:text-foreground">
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
                 <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
-                  <motion.div className="h-full rounded-full bg-primary" animate={{ width: `${totalProgress * 100}%` }} />
+                  <motion.div className="h-full rounded-full" style={{ background: TYPE_COLOR[navigatingTo.type] }}
+                    animate={{ width: `${totalProgress * 100}%` }} />
                 </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Building Info */}
-        <AnimatePresence>
-          {selectedBuilding && !navigatingTo && (
-            <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }}
-              transition={{ type: 'spring', damping: 25 }}
-              className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-30 w-full max-w-sm px-4">
-              <div className="backdrop-blur-xl bg-white/85 border border-white/50 rounded-2xl p-5 shadow-lg">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-muted border border-border flex items-center justify-center text-lg font-bold text-muted-foreground shrink-0">{selectedBuilding.id}</div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-bold text-foreground">{selectedBuilding.shortName}</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5 truncate">{selectedBuilding.name}</p>
-                    <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                      <MapPin className="w-3 h-3" />
-                      {selectedBuilding.wing === 'west' ? 'West Wing' : selectedBuilding.wing === 'east' ? 'East Wing' : 'Central Campus'}
-                      <span className="mx-1">•</span>
-                      {selectedBuilding.floors} floors
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-2 mt-4">
-                  <Button onClick={() => navigateTo(selectedBuilding)} className="flex-1 rounded-xl h-10 text-sm font-semibold">
-                    <Navigation className="w-4 h-4 mr-2" />Navigate
-                  </Button>
-                  <Button onClick={() => setSelectedBuilding(null)} variant="outline" className="rounded-xl h-10">Close</Button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Arrival */}
+        {/* ─── Arrived Banner ─── */}
         <AnimatePresence>
           {arrived && navigatingTo && (
-            <motion.div initial={{ y: -80, opacity: 0, scale: 0.9 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: -80, opacity: 0 }}
-              transition={{ type: 'spring', damping: 20 }}
-              className="absolute top-24 md:top-28 left-1/2 -translate-x-1/2 z-30 w-auto max-w-[90vw]">
-              <div className="backdrop-blur-xl bg-white/90 border border-white/60 rounded-2xl px-5 md:px-6 py-4 shadow-lg flex items-center gap-3">
-                <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1.5 }}>
-                  <MapPin className="w-5 h-5 text-primary" />
-                </motion.div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">You have arrived at</p>
-                  <p className="text-base font-bold text-foreground">{navigatingTo.shortName}</p>
+            <motion.div initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 w-full max-w-sm px-4">
+              <div className="backdrop-blur-xl bg-white/90 border border-white/50 rounded-2xl p-4 shadow-xl text-center">
+                <p className="text-sm font-bold text-foreground mb-0.5">✅ Arrived at {navigatingTo.shortName}</p>
+                <p className="text-xs text-muted-foreground mb-3">{navigatingTo.hours}</p>
+                <div className="flex gap-2">
+                  <button onClick={() => { setSelectedBuilding(navigatingTo); setNavigatingTo(null); setArrived(false); }}
+                    className="flex-1 py-2 rounded-xl text-xs font-semibold border border-border hover:bg-muted transition-colors">
+                    View Info
+                  </button>
+                  <button onClick={resetNavigation}
+                    className="flex-1 py-2 rounded-xl text-xs font-semibold text-white transition-opacity hover:opacity-80"
+                    style={{ background: TYPE_COLOR[navigatingTo.type] }}>
+                    Done
+                  </button>
                 </div>
-                <button onClick={resetNavigation} className="ml-4">
-                  <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
-                </button>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* ─── Legend ─── */}
+        <Legend />
+
+        {/* ─── Mobile bottom bar ─── */}
+        <div className="md:hidden absolute bottom-24 left-4 right-4 z-20 flex gap-2">
+          <button onClick={() => navigateTo(buildings[3])}
+            className="flex-1 backdrop-blur-xl bg-red-500/80 border border-red-400/50 rounded-xl py-2.5 flex items-center justify-center gap-1.5 text-white">
+            <AlertTriangle className="w-4 h-4" /><span className="text-xs font-bold">Emergency</span>
+          </button>
+          <button onClick={() => setShowDirectory(d => !d)}
+            className="flex-1 backdrop-blur-xl bg-white/70 border border-white/50 rounded-xl py-2.5 flex items-center justify-center gap-1.5">
+            <List className="w-4 h-4 text-foreground" /><span className="text-xs font-semibold">Directory</span>
+          </button>
+          <button onClick={resetNavigation}
+            className="backdrop-blur-xl bg-white/70 border border-white/50 rounded-xl px-3 py-2.5 flex items-center justify-center">
+            <RotateCcw className="w-4 h-4 text-muted-foreground" />
+          </button>
+        </div>
       </div>
     </div>
   );
 };
-
 export default CampusMapPage;
