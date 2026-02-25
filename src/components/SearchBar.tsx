@@ -158,14 +158,6 @@ const SearchBar: React.FC = () => {
       >
         <Search className="w-3.5 h-3.5 group-hover:text-primary transition-colors" />
         <span className="hidden sm:inline font-medium">{isAr ? 'بحث...' : 'Search...'}</span>
-        <span className="hidden md:inline-flex items-center gap-0.5 ml-1">
-          <kbd className="inline-flex h-5 items-center rounded border border-border/60 bg-muted/60 px-1 text-[10px] font-mono text-muted-foreground/70">
-            {isMac ? '⌘' : 'Ctrl'}
-          </kbd>
-          <kbd className="inline-flex h-5 items-center rounded border border-border/60 bg-muted/60 px-1 text-[10px] font-mono text-muted-foreground/70">
-            K
-          </kbd>
-        </span>
         <span className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 ring-1 ring-primary/20 transition-opacity pointer-events-none" />
       </button>
 
@@ -387,11 +379,6 @@ const SearchBar: React.FC = () => {
             <span className="flex items-center gap-1"><kbd className="rounded border border-border/50 bg-muted/60 px-1 font-mono">↑↓</kbd> {isAr ? 'تنقل' : 'navigate'}</span>
             <span className="flex items-center gap-1"><kbd className="rounded border border-border/50 bg-muted/60 px-1 font-mono">↵</kbd> {isAr ? 'فتح' : 'open'}</span>
             <span className="flex items-center gap-1"><kbd className="rounded border border-border/50 bg-muted/60 px-1 font-mono">esc</kbd> {isAr ? 'إغلاق' : 'close'}</span>
-            <span className="flex items-center gap-0.5">
-              <kbd className="rounded border border-border/50 bg-muted/60 px-1 font-mono">{isMac ? '⌘' : 'Ctrl'}</kbd>
-              <kbd className="rounded border border-border/50 bg-muted/60 px-1 font-mono">K</kbd>
-              {isAr ? 'تبديل' : 'toggle'}
-            </span>
           </div>
           <span className="text-[10px] text-muted-foreground/40 font-medium">CapMed Search</span>
         </div>
