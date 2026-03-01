@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, Suspense } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Html } from '@react-three/drei';
+import { OrbitControls, Html, Environment, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -165,14 +165,14 @@ function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
 
 /* ─── 3D Materials ─── */
 const FLOOR_H = 1.6;
-const concreteMat = new THREE.MeshStandardMaterial({ color: '#c8c0b8', roughness: 0.85, metalness: 0.05 });
-const stoneMat = new THREE.MeshStandardMaterial({ color: '#d4cdc4', roughness: 0.9, metalness: 0.02 });
-const glassMat = new THREE.MeshPhysicalMaterial({ color: '#88aabb', roughness: 0.05, metalness: 0.3, transmission: 0.4, transparent: true, opacity: 0.7 });
-const darkMat = new THREE.MeshStandardMaterial({ color: '#6b7280', roughness: 0.7, metalness: 0.1 });
-const canopyMat = new THREE.MeshStandardMaterial({ color: '#e8e4de', roughness: 0.6, metalness: 0.15 });
-const roofEquipMat = new THREE.MeshStandardMaterial({ color: '#8a8a8a', roughness: 0.5, metalness: 0.4 });
-const asphaltMat = new THREE.MeshStandardMaterial({ color: '#555', roughness: 0.8, metalness: 0.05 });
-const curbMat = new THREE.MeshStandardMaterial({ color: '#999', roughness: 0.7 });
+const concreteMat = new THREE.MeshStandardMaterial({ color: '#c8c0b8', roughness: 0.6, metalness: 0.1 });
+const stoneMat = new THREE.MeshStandardMaterial({ color: '#d4cdc4', roughness: 0.7, metalness: 0.05 });
+const glassMat = new THREE.MeshPhysicalMaterial({ color: '#88aabb', roughness: 0.1, metalness: 0.7, transmission: 0.85, transparent: true, opacity: 0.8, ior: 1.5 });
+const darkMat = new THREE.MeshStandardMaterial({ color: '#4a5568', roughness: 0.5, metalness: 0.2 });
+const canopyMat = new THREE.MeshStandardMaterial({ color: '#e8e4de', roughness: 0.4, metalness: 0.15 });
+const roofEquipMat = new THREE.MeshStandardMaterial({ color: '#718096', roughness: 0.5, metalness: 0.6 });
+const asphaltMat = new THREE.MeshStandardMaterial({ color: '#4a5568', roughness: 0.9, metalness: 0.05 });
+const curbMat = new THREE.MeshStandardMaterial({ color: '#a0aec0', roughness: 0.7 });
 
 /* ─── Building3D ─── */
 interface B3DProps { data: BuildingData; isSelected: boolean; isTarget: boolean; arrived: boolean; onClick: () => void; }
@@ -552,16 +552,18 @@ const CampusMapPage: React.FC = () => {
         {/* ─── 3D Canvas ─── */}
         <Canvas shadows camera={{ position: [0, 60, 80], fov: 45 }} className="absolute inset-0"
           dpr={[1, 1.5]}
-          gl={{ antialias: false, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.1, powerPreference: "high-performance", preserveDrawingBuffer: true }}
+          gl={{ antialias: false, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0, powerPreference: "high-performance", preserveDrawingBuffer: true }}
           style={{ background: 'linear-gradient(180deg,#c8dae8 0%,#e8dcc8 60%,#d4c8a8 100%)' }}>
           <Suspense fallback={null}>
-            <ambientLight intensity={0.5} color="#f0e8d8" />
-            <directionalLight position={[40, 60, 30]} intensity={2} color="#fff5e0" castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} shadow-camera-left={-80} shadow-camera-right={80} shadow-camera-top={80} shadow-camera-bottom={-80} shadow-bias={-0.001} />
-            <directionalLight position={[-20, 30, -20]} intensity={0.3} color="#a8c4e0" />
-            <hemisphereLight args={['#b8d0e8', '#c4b494', 0.5]} />
-            <fog attach="fog" args={['#d8cfc0', 100, 220]} />
+            <Environment preset="city" />
+            <ambientLight intensity={0.4} color="#f0e8d8" />
+            <directionalLight position={[40, 60, 30]} intensity={1.5} color="#fff5e0" castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} shadow-camera-left={-80} shadow-camera-right={80} shadow-camera-top={80} shadow-camera-bottom={-80} shadow-bias={-0.001} />
+            <directionalLight position={[-20, 30, -20]} intensity={0.2} color="#a8c4e0" />
+            <hemisphereLight args={['#b8d0e8', '#c4b494', 0.4]} />
+            <fog attach="fog" args={['#d8cfc0', 100, 250]} />
             <CameraController userPos={userPos} isNavigating={!!navigatingTo && !arrived} />
             <Ground /><Roads /><Vegetation />
+            <ContactShadows position={[0, 0.1, 0]} opacity={0.5} scale={150} blur={2} far={20} />
             {buildings.map(b => (
               <Building3D key={b.id} data={b}
                 isSelected={selectedBuilding?.id === b.id}
