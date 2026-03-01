@@ -455,6 +455,8 @@ const WALK_SPEED = 0.003;
 type CategoryFilter = 'all' | BuildingType;
 
 const CampusMapPage: React.FC = () => {
+  const { t, language } = useLanguage();
+  const isAr = language === 'ar';
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBuilding, setSelectedBuilding] = useState<BuildingData | null>(null);
   const [navigatingTo, setNavigatingTo] = useState<BuildingData | null>(null);
